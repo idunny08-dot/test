@@ -102,7 +102,7 @@
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* Lock Screen (시간 글씨 두껍고 반투명하게 다듬음) */
+        /* Lock Screen */
         #lock-screen {
             justify-content: space-between; align-items: center;
             padding: 70px 20px 25px; text-align: center; color: #fff;
@@ -126,27 +126,21 @@
             50% { transform: translateY(-5px); }
         }
 
-        /* Passcode Screen (알파벳 없이 완벽 정렬된 키패드) */
+        /* Passcode Screen (반투명 키패드 버튼 및 아래로 내려간 하단 버튼 배치) */
         #passcode-screen {
             position: absolute; inset: 0;
             background: rgba(120, 120, 128, 0.45);
             backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
             color: #fff; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            padding: 40px 20px;
+            justify-content: space-between; align-items: center;
+            padding: 55px 25px 35px;
             z-index: 600; transform: translateY(100%);
             transition: transform 0.48s cubic-bezier(0.32, 0.72, 0, 1);
         }
         #passcode-screen.active { transform: translateY(0); }
 
-        .passcode-content-wrap {
-            display: flex; flex-direction: column; align-items: center;
-            justify-content: center; width: 100%; max-width: 280px;
-            margin: auto; gap: 20px;
-        }
-
         .passcode-header-group {
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
+            display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 10px;
         }
         .passcode-header-title {
             font-size: 17px; font-weight: 500; letter-spacing: -0.2px;
@@ -157,22 +151,22 @@
 
         .keypad {
             display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 14px 20px; width: 100%;
+            gap: 10px 14px; width: 100%; max-width: 250px; margin-bottom: 10px;
         }
         .key {
-            width: 68px; height: 68px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.28);
+            width: 64px; height: 64px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
             backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center;
             margin: auto; cursor: pointer;
             transition: background 0.15s ease, transform 0.1s ease;
         }
-        .key:active { background: rgba(255, 255, 255, 0.5); transform: scale(0.96); }
+        .key:active { background: rgba(255, 255, 255, 0.45); transform: scale(0.96); }
         .key-num { font-size: 26px; font-weight: 400; line-height: 1; }
 
         .passcode-footer {
-            width: 100%; display: flex; justify-content: space-between; align-items: center;
-            font-size: 14px; font-weight: 400; padding: 0 12px; color: #fff; margin-top: 5px;
+            width: 100%; max-width: 280px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; font-weight: 400; padding: 0 10px; color: #fff; margin-bottom: 5px;
         }
         .btn-pass-action { cursor: pointer; opacity: 0.95; }
         .btn-pass-action:active { opacity: 0.6; }
@@ -252,7 +246,6 @@
 
     <!-- 📱 LIVE PHONE -->
     <div class="iphone-frame" id="phone-root">
-        <!-- Dynamic Island (완전 깔끔하게 비워둠) -->
         <div class="dynamic-island" id="dynamic-island-box"></div>
 
         <div class="status-bar">
@@ -281,33 +274,31 @@
             </div>
         </div>
 
-        <!-- 2. Passcode Screen (숫자 밑 알파벳 제거 및 완벽 정렬) -->
+        <!-- 2. Passcode Screen -->
         <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
-            <div class="passcode-content-wrap" onclick="event.stopPropagation()">
-                <div class="passcode-header-group">
-                    <div class="passcode-header-title">암호 입력</div>
-                    <div class="pass-dots" id="p-dots">
-                        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                    </div>
+            <div class="passcode-header-group" onclick="event.stopPropagation()">
+                <div class="passcode-header-title">암호 입력</div>
+                <div class="pass-dots" id="p-dots">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
+            </div>
 
-                <div class="keypad">
-                    <div class="key" onclick="pressKey('1')"><span class="key-num">1</span></div>
-                    <div class="key" onclick="pressKey('2')"><span class="key-num">2</span></div>
-                    <div class="key" onclick="pressKey('3')"><span class="key-num">3</span></div>
-                    <div class="key" onclick="pressKey('4')"><span class="key-num">4</span></div>
-                    <div class="key" onclick="pressKey('5')"><span class="key-num">5</span></div>
-                    <div class="key" onclick="pressKey('6')"><span class="key-num">6</span></div>
-                    <div class="key" onclick="pressKey('7')"><span class="key-num">7</span></div>
-                    <div class="key" onclick="pressKey('8')"><span class="key-num">8</span></div>
-                    <div class="key" onclick="pressKey('9')"><span class="key-num">9</span></div>
-                    <div class="key" style="grid-column: 2;" onclick="pressKey('0')"><span class="key-num">0</span></div>
-                </div>
+            <div class="keypad" onclick="event.stopPropagation()">
+                <div class="key" onclick="pressKey('1')"><span class="key-num">1</span></div>
+                <div class="key" onclick="pressKey('2')"><span class="key-num">2</span></div>
+                <div class="key" onclick="pressKey('3')"><span class="key-num">3</span></div>
+                <div class="key" onclick="pressKey('4')"><span class="key-num">4</span></div>
+                <div class="key" onclick="pressKey('5')"><span class="key-num">5</span></div>
+                <div class="key" onclick="pressKey('6')"><span class="key-num">6</span></div>
+                <div class="key" onclick="pressKey('7')"><span class="key-num">7</span></div>
+                <div class="key" onclick="pressKey('8')"><span class="key-num">8</span></div>
+                <div class="key" onclick="pressKey('9')"><span class="key-num">9</span></div>
+                <div class="key" style="grid-column: 2;" onclick="pressKey('0')"><span class="key-num">0</span></div>
+            </div>
 
-                <div class="passcode-footer">
-                    <span class="btn-pass-action" onclick="alert('긴급통화 화면')">긴급상황</span>
-                    <span class="btn-pass-action" onclick="cancelPasscode()">취소</span>
-                </div>
+            <div class="passcode-footer" onclick="event.stopPropagation()">
+                <span class="btn-pass-action" onclick="alert('긴급통화 화면')">긴급상황</span>
+                <span class="btn-pass-action" onclick="cancelPasscode()">취소</span>
             </div>
 
             <div class="home-indicator-bar" style="position:absolute; bottom:6px; left:50%; transform:translateX(-50%); animation:none; opacity:0.8;"></div>
@@ -419,7 +410,8 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v14')) || {
+    // URL 해시(데이터) 또는 로컬스토리지 연동 시스템
+    let db = {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
@@ -427,10 +419,22 @@
         icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', insta: '📸', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' }
     };
 
+    function loadDatabase() {
+        try {
+            if (window.location.hash && window.location.hash.length > 1) {
+                const jsonStr = decodeURIComponent(escape(atob(window.location.hash.substring(1))));
+                const parsed = JSON.parse(jsonStr);
+                if (parsed) return parsed;
+            }
+        } catch(e) {}
+        return JSON.parse(localStorage.getItem('ios_world_db_v15')) || db;
+    }
+
+    db = loadDatabase();
+
     let passInput = '';
     let currentActiveAppId = null;
 
-    // URL 파라미터 체크 (링크 모드 시 에디터 숨김 및 풀스크린 정렬 적용)
     const urlParams = new URLSearchParams(window.location.search);
     const isPhoneOnly = urlParams.get('mode') === 'phone_only';
 
@@ -513,7 +517,6 @@
         }
     }
 
-    // 1:1 Editor Tab Switch & Phone View Sync
     function switchTab(panelId) {
         if (isPhoneOnly) return;
 
@@ -548,7 +551,6 @@
         }
     }
 
-    // File Uploads
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -577,9 +579,12 @@
         saveAndRender();
     }
 
+    // 실시간 링크 업데이트(URL Hash 동기화) 기능 포함
     function saveAndRender() {
         try {
-            localStorage.setItem('ios_world_db_v14', JSON.stringify(db));
+            localStorage.setItem('ios_world_db_v15', JSON.stringify(db));
+            const jsonStr = btoa(unescape(encodeURIComponent(JSON.stringify(db))));
+            history.replaceState(null, '', '#' + jsonStr);
         } catch (e) {
             alert('사진 용량이 너무 큽니다! 용량이 작은 이미지를 선택해 주세요.');
             return;
@@ -639,7 +644,6 @@
         return item;
     }
 
-    // ⭐ 비밀번호 맞을 시 홈화면으로 이동하도록 수정 완료
     function pressKey(num) {
         if (passInput.length < 4) {
             passInput += num; updateDots();
@@ -729,11 +733,12 @@
     }
 
     function exportWorldLink() {
+        saveAndRender(); // 현재 상태를 해시에 반영
         const currentUrl = window.location.href.split('?')[0];
-        const shareableLink = currentUrl + '?mode=phone_only';
+        const shareableLink = currentUrl + '?mode=phone_only' + window.location.hash;
         
         navigator.clipboard.writeText(shareableLink).then(() => {
-            alert('✨ 순수 스마트폰 세계관 링크가 복사되었습니다!\n\n이 링크를 새 창에 열면 에디터 없이 모바일 화면에 꽉 찬 순수 폰 화면만 조작할 수 있습니다.');
+            alert('✨ 실시간 편집 내용이 반영된 순수 스마트폰 링크가 복사되었습니다!\n\n이 링크로 접속하면 폰 화면만 꽉 차게 조작할 수 있습니다.');
         }).catch(() => {
             prompt('아래 링크를 복사하세요:', shareableLink);
         });

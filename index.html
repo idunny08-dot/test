@@ -97,35 +97,24 @@
             50% { transform: translateY(-5px); }
         }
 
-        /* Passcode Screen (하단 바 및 입력 영역만 부드럽게 연동) */
+        /* Passcode Screen (전체화면 암호 입력 방식 복원) */
         #passcode-screen {
             position: absolute; inset: 0;
-            background: rgba(0,0,0,0.45); backdrop-filter: blur(25px);
+            background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(35px);
             color: #fff; display: flex; flex-direction: column;
-            justify-content: flex-end; align-items: center;
-            z-index: 600; opacity: 0; pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        #passcode-screen.active { opacity: 1; pointer-events: auto; }
-        
-        .passcode-sheet {
-            width: 100%; padding: 30px 20px 40px;
-            background: rgba(20, 20, 22, 0.75); backdrop-filter: blur(35px);
-            border-radius: 32px 32px 0 0;
-            display: flex; flex-direction: column; align-items: center;
-            transform: translateY(100%);
+            justify-content: center; align-items: center; gap: 20px;
+            z-index: 600; transform: translateY(100%);
             transition: transform 0.35s cubic-bezier(0.19, 1, 0.22, 1);
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.4);
         }
-        #passcode-screen.active .passcode-sheet { transform: translateY(0); }
+        #passcode-screen.active { transform: translateY(0); }
 
-        .pass-dots { display: flex; gap: 14px; margin-bottom: 22px; }
+        .pass-dots { display: flex; gap: 14px; margin-bottom: 10px; }
         .dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #fff; }
         .dot.filled { background: #fff; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 16px; width: 80%; max-width: 270px; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 18px; width: 75%; max-width: 270px; }
         .key {
-            width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.18);
-            display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: 400;
+            width: 68px; height: 68px; border-radius: 50%; background: rgba(255,255,255,0.18);
+            display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: 400;
             margin: auto; cursor: pointer; transition: background 0.15s ease;
         }
         .key:active { background: rgba(255,255,255,0.4); }
@@ -148,12 +137,19 @@
             border-radius: 24px; display: flex; justify-content: space-around; align-items: center; padding: 0 8px;
         }
 
-        /* App Inside View */
+        /* App Inside View (빨려 들어가는 홈 복귀 애니메이션 적용) */
         .app-view {
             position: absolute; inset: 0; background: #fff; color: #000;
             z-index: 700; display: none; flex-direction: column;
+            transform-origin: center center;
+            transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease;
         }
         .app-view.active { display: flex; }
+        .app-view.closing {
+            transform: scale(0.15) translateY(150px);
+            opacity: 0;
+            border-radius: 40px;
+        }
         .app-view-header {
             height: 46px; border-bottom: 1px solid #eee; padding: 0 16px;
             display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px;
@@ -228,26 +224,23 @@
             </div>
         </div>
 
-        <!-- 2. Passcode Sheet Screen -->
-        <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
-            <div class="passcode-sheet" id="passcode-sheet-box">
-                <div style="width: 36px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-bottom: 18px;"></div>
-                <div style="font-size:13px; font-weight: 500; margin-bottom: 14px;">암호 입력</div>
-                <div class="pass-dots" id="p-dots">
-                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-                </div>
-                <div class="keypad">
-                    <div class="key" onclick="pressKey('1')">1</div>
-                    <div class="key" onclick="pressKey('2')">2</div>
-                    <div class="key" onclick="pressKey('3')">3</div>
-                    <div class="key" onclick="pressKey('4')">4</div>
-                    <div class="key" onclick="pressKey('5')">5</div>
-                    <div class="key" onclick="pressKey('6')">6</div>
-                    <div class="key" onclick="pressKey('7')">7</div>
-                    <div class="key" onclick="pressKey('8')">8</div>
-                    <div class="key" onclick="pressKey('9')">9</div>
-                    <div class="key" style="grid-column: 2;" onclick="pressKey('0')">0</div>
-                </div>
+        <!-- 2. Passcode Screen (전체화면 암호 입력) -->
+        <div class="screen" id="passcode-screen">
+            <div style="font-size:14px; font-weight: 500; margin-bottom: 5px;">암호 입력</div>
+            <div class="pass-dots" id="p-dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="keypad">
+                <div class="key" onclick="pressKey('1')">1</div>
+                <div class="key" onclick="pressKey('2')">2</div>
+                <div class="key" onclick="pressKey('3')">3</div>
+                <div class="key" onclick="pressKey('4')">4</div>
+                <div class="key" onclick="pressKey('5')">5</div>
+                <div class="key" onclick="pressKey('6')">6</div>
+                <div class="key" onclick="pressKey('7')">7</div>
+                <div class="key" onclick="pressKey('8')">8</div>
+                <div class="key" onclick="pressKey('9')">9</div>
+                <div class="key" style="grid-column: 2;" onclick="pressKey('0')">0</div>
             </div>
         </div>
 
@@ -257,10 +250,10 @@
             <div class="dock" id="dock-grid"></div>
         </div>
 
-        <!-- 4. Inside App View (스와이프 업 제스처바로 홈 복귀 지원) -->
+        <!-- 4. Inside App View (빨려 들어가는 애니메이션 적용) -->
         <div class="app-view" id="app-view">
             <div class="app-view-header">
-                <span style="color:#007aff; cursor:pointer;" onclick="closeApp()">‹ 뒤로</span>
+                <span style="color:#007aff; cursor:pointer;" onclick="returnToHomeFromApp()">‹ 뒤로</span>
                 <span id="app-title">앱</span>
                 <span></span>
             </div>
@@ -357,7 +350,7 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v9')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v10')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
@@ -380,7 +373,7 @@
     setInterval(updateRealtimeClock, 1000);
     updateRealtimeClock();
 
-    // Swipe Up Gesture for Passcode Sheet
+    // Swipe Up Gesture for Passcode Screen (하단 바 쓸어올려 전체화면 암호창 띄우기)
     const lockScreen = document.getElementById('lock-screen');
     let startY = 0;
     let isSwiping = false;
@@ -394,7 +387,7 @@
         if (!isSwiping) return;
         let endY = e.changedTouches[0].clientY;
         if (startY - endY > 40) {
-            triggerPasscodeSheet();
+            triggerPasscodeScreen();
         }
         isSwiping = false;
     });
@@ -406,12 +399,12 @@
     lockScreen.addEventListener('mouseup', (e) => {
         if (!isSwiping) return;
         if (startY - e.clientY > 30) {
-            triggerPasscodeSheet();
+            triggerPasscodeScreen();
         }
         isSwiping = false;
     });
 
-    // App Inside Swipe Up Gesture (하단 바 쓸어올려 홈으로 복귀)
+    // App Inside Swipe Up Gesture (하단 바 쓸어올려 빨려 들어가며 홈 복귀)
     const appSwipeBar = document.getElementById('app-home-swipe-bar');
     let appStartY = 0;
     appSwipeBar.addEventListener('touchstart', (e) => {
@@ -424,15 +417,9 @@
         }
     });
 
-    function triggerPasscodeSheet() {
+    function triggerPasscodeScreen() {
         document.getElementById('passcode-screen').classList.add('active');
         passInput = ''; updateDots();
-    }
-
-    function checkOutsidePassClick(e) {
-        if (e.target.id === 'passcode-screen') {
-            document.getElementById('passcode-screen').classList.remove('active');
-        }
     }
 
     // 1:1 Editor Tab Switch & Phone View Sync
@@ -454,12 +441,12 @@
             document.getElementById('passcode-screen').classList.remove('active');
             document.getElementById('home-screen').classList.remove('active');
             lockScreen.classList.add('active');
-            closeApp();
+            closeAppInstant();
         } else if (panelId === 'home') {
             document.getElementById('passcode-screen').classList.remove('active');
             lockScreen.classList.remove('active');
             document.getElementById('home-screen').classList.add('active');
-            closeApp();
+            closeAppInstant();
         } else {
             document.getElementById('passcode-screen').classList.remove('active');
             lockScreen.classList.remove('active');
@@ -499,7 +486,7 @@
 
     function saveAndRender() {
         try {
-            localStorage.setItem('ios_world_db_v9', JSON.stringify(db));
+            localStorage.setItem('ios_world_db_v10', JSON.stringify(db));
         } catch (e) {
             alert('사진 용량이 너무 큽니다! 용량이 작은 이미지를 선택해 주세요.');
             return;
@@ -567,7 +554,7 @@
                         document.getElementById('passcode-screen').classList.remove('active');
                         switchTab('home');
                     } else {
-                        // 비밀번호 틀렸을 때 팝업 없이 곧바로 입력 전 창(초기화)으로 복귀
+                        // 비밀번호가 틀렸을 때 초기화면(숫자만 떠있던 대기 상태)으로 즉시 복귀
                         passInput = '';
                         updateDots();
                         document.getElementById('passcode-screen').classList.remove('active');
@@ -586,6 +573,7 @@
         const body = document.getElementById('app-body');
         const title = document.getElementById('app-title');
 
+        view.classList.remove('closing');
         const appNames = {
             memo: '메모', gallery: '사진', camera: '카메라', calendar: '캘린더',
             insta: '인스타그램', phone: '전화', kakao: '카카오톡', music: '음악', safari: '인터넷'
@@ -597,13 +585,19 @@
         view.classList.add('active');
     }
 
-    function closeApp() {
-        document.getElementById('app-view').classList.remove('active');
+    function closeAppInstant() {
+        const view = document.getElementById('app-view');
+        view.classList.remove('active', 'closing');
     }
 
+    // 앱에서 홈으로 부드럽게 빨려 들어가며 돌아오는 모션 애니메이션
     function returnToHomeFromApp() {
-        closeApp();
-        switchTab('home');
+        const view = document.getElementById('app-view');
+        view.classList.add('closing');
+        setTimeout(() => {
+            view.classList.remove('active', 'closing');
+            switchTab('home');
+        }, 300);
     }
 
     // Init Inputs

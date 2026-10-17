@@ -3,369 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>iOS Full Simulator & World Customizer</title>
+    <title>iOS World Simulator Studio</title>
     <style>
         * {
             margin: 0; padding: 0; box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
         }
 
         body {
-            background-color: #000;
-            color: #fff;
-            height: 100vh;
-            overflow: hidden;
+            background-color: #f2f2f7;
+            color: #1c1c1e;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            min-height: 100vh;
+            padding-bottom: 50px;
         }
 
-        /* iPhone Display Frame */
-        #iphone {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            max-height: 932px;
-            position: relative;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            box-shadow: 0 0 50px rgba(255,255,255,0.1);
-        }
-
-        /* Status Bar */
-        .status-bar {
-            position: absolute;
-            top: 0; width: 100%; height: 44px;
-            padding: 0 24px;
+        /* Top Studio Header */
+        .studio-header {
+            width: 100%; max-width: 480px; padding: 14px 20px;
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 14px; font-weight: 600;
-            z-index: 500;
-            pointer-events: none;
+            background: #fff; border-bottom: 1px solid #e5e5ea;
+            position: sticky; top: 0; z-index: 1000;
+        }
+        .studio-title { font-size: 15px; font-weight: 700; }
+        .btn-export {
+            background: #007aff; color: #fff; border: none;
+            padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
         }
 
-        /* Top Settings Bar Button */
-        .global-settings-btn {
-            position: absolute;
-            top: 48px; right: 16px;
-            z-index: 501;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
+        /* 📱 LIVE PHONE (세계관 속 실제 폰) */
+        .iphone-frame {
+            width: 100%; max-width: 380px; height: 720px;
+            margin: 20px 0; border-radius: 44px; border: 10px solid #1c1c1e;
+            position: relative; overflow: hidden;
+            background-size: cover; background-position: center;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.2);
         }
 
-        /* 1. LOCK SCREEN */
+        .status-bar {
+            position: absolute; top: 0; width: 100%; height: 36px;
+            padding: 0 20px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 12px; font-weight: 600; color: #fff; z-index: 500;
+        }
+
+        /* Phone Screens */
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        /* Lock Screen */
         #lock-screen {
-            position: absolute; inset: 0;
-            z-index: 300;
-            display: flex; flex-direction: column; justify-content: space-between;
-            align-items: center;
-            padding: 60px 20px 40px;
-            background-size: cover; background-position: center;
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            justify-content: space-between; align-items: center;
+            padding: 60px 20px 40px; text-align: center; color: #fff;
+            background-size: cover; background-position: center; cursor: pointer;
         }
-        #lock-screen.unlocked { transform: translateY(-100%); }
+        .lock-date { font-size: 17px; font-weight: 500; opacity: 0.9; }
+        .lock-time { font-size: 72px; font-weight: 200; letter-spacing: -2px; margin-top: -8px; }
 
-        .lock-clock { text-align: center; margin-top: 20px; }
-        .lock-date { font-size: 19px; font-weight: 500; opacity: 0.9; }
-        .lock-time { font-size: 80px; font-weight: 200; letter-spacing: -2px; margin-top: -10px; }
-        .unlock-swipe { font-size: 13px; opacity: 0.8; animation: bounce 1.5s infinite; }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        /* 2. PASSCODE SCREEN */
+        /* Passcode Keypad */
         #passcode-screen {
-            position: absolute; inset: 0;
-            z-index: 400;
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(30px);
-            display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-            gap: 25px;
-            transition: opacity 0.3s ease;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(30px);
+            color: #fff; justify-content: center; align-items: center; gap: 20px; z-index: 600;
         }
-        #passcode-screen.active { display: flex; }
-        .pass-dots { display: flex; gap: 16px; }
-        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; }
+        .pass-dots { display: flex; gap: 14px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #fff; }
         .dot.filled { background: #fff; }
-        .keypad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 75%; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 75%; }
         .key {
-            width: 70px; height: 70px; border-radius: 50%;
-            background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
-            display: flex; justify-content: center; align-items: center;
-            font-size: 26px; font-weight: 400; margin: auto; cursor: pointer;
+            width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2);
+            display: flex; justify-content: center; align-items: center; font-size: 24px; margin: auto; cursor: pointer;
         }
-        .key:active { background: rgba(255,255,255,0.4); }
 
-        /* 3. HOME SCREEN */
+        /* Home Screen */
         #home-screen {
-            position: absolute; inset: 0;
             background-size: cover; background-position: center;
-            padding: 70px 20px 20px;
-            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 55px 16px 20px; justify-content: space-between;
         }
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 16px; }
-        .app-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 12px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .app-icon {
-            width: 62px; height: 62px; border-radius: 15px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            background-size: cover; background-position: center;
+            width: 58px; height: 58px; border-radius: 14px;
+            display: flex; justify-content: center; align-items: center; font-size: 28px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-size: cover; background-position: center;
         }
-        .app-label { font-size: 11px; margin-top: 5px; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-
+        .app-label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .dock {
-            height: 90px;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(25px);
-            border-radius: 32px;
-            display: flex; justify-content: space-around; align-items: center;
-            padding: 0 10px;
+            height: 84px; background: rgba(255,255,255,0.25); backdrop-filter: blur(20px);
+            border-radius: 28px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px;
         }
 
-        /* 4. APP VIEW MODAL (Inside Apps) */
+        /* App Inside Views */
         .app-view {
-            position: absolute; inset: 0;
-            background: #fff; color: #000;
-            z-index: 600; display: none; flex-direction: column;
-            animation: slideUp 0.3s cubic-bezier(0,0,0.2,1);
+            position: absolute; inset: 0; background: #fff; color: #000;
+            z-index: 700; display: none; flex-direction: column;
         }
         .app-view.active { display: flex; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .app-view-header {
+            height: 48px; border-bottom: 1px solid #eee; padding: 0 16px;
+            display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px;
+            margin-top: 25px; background: #fcfcfc;
+        }
+        .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #f2f2f7; }
 
-        .app-header {
-            height: 50px; margin-top: 30px;
-            padding: 0 16px; border-bottom: 1px solid #e5e5ea;
-            display: flex; justify-content: space-between; align-items: center;
-            font-weight: 600; background: #f9f9f9;
+        /* 🛠️ EDITOR DASHBOARD (하단 제어판) */
+        .editor-dashboard {
+            width: 100%; max-width: 480px; background: #ffffff;
+            border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
-        .app-body { flex: 1; overflow-y: auto; padding: 16px; }
-
-        /* 5. CONFIG / EDITOR MODAL */
-        #config-modal {
-            position: absolute; inset: 0;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(20px);
-            z-index: 700; display: none; flex-direction: column;
-            padding: 50px 20px 20px; color: #fff;
+        .editor-tabs {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f2f2f7;
         }
-        #config-modal.active { display: flex; }
-        .config-card { background: #1c1c1e; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-        .config-card h3 { font-size: 15px; margin-bottom: 10px; color: #0a84ff; }
-        .input-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-        .input-group label { font-size: 12px; opacity: 0.7; }
-        .input-group input, .input-group textarea {
-            background: #2c2c2e; border: 1px solid #3a3a3c; color: #fff;
-            padding: 10px; border-radius: 8px; font-size: 13px; outline: none;
+        .tab-btn {
+            height: 44px; border-radius: 12px; background: #f2f2f7;
+            display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer;
         }
-        .btn-close-config {
-            background: #0a84ff; color: white; border: none; padding: 14px;
-            border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; margin-top: auto;
+        .tab-btn.active { background: #e8f0fe; color: #007aff; }
+        .panel { display: none; flex-direction: column; gap: 12px; }
+        .panel.active { display: flex; }
+        .panel-title { font-size: 15px; font-weight: 700; }
+        .f-group { display: flex; flex-direction: column; gap: 4px; }
+        .f-group label { font-size: 11px; font-weight: 600; color: #8e8e93; }
+        .f-input {
+            width: 100%; padding: 10px; border-radius: 10px;
+            border: 1px solid #e5e5ea; background: #f9f9fb; font-size: 13px; outline: none;
         }
     </style>
 </head>
 <body>
 
-<div id="iphone">
-    <!-- Status Bar -->
-    <div class="status-bar">
-        <span id="st-time">09:41</span>
-        <span>􀛨 5G 🔋</span>
+    <div class="studio-header">
+        <div class="studio-title">세계관 스튜디오 에디터</div>
+        <button class="btn-export" onclick="alert('세계관 데이터가 저장되었습니다!')">저장 완료</button>
     </div>
 
-    <button class="global-settings-btn" onclick="openConfigModal()">⚙️ 커스텀 설정</button>
-
-    <!-- 1. LOCK SCREEN -->
-    <div id="lock-screen">
-        <div class="lock-clock">
-            <div class="lock-date" id="lk-date">10월 24일 토요일</div>
-            <div class="lock-time" id="lk-time">09:41</div>
+    <!-- 📱 LIVE PHONE -->
+    <div class="iphone-frame" id="phone-root">
+        <div class="status-bar">
+            <span id="st-time">09:41</span>
+            <span>􀛨 5G 🔋</span>
         </div>
-        <div class="unlock-swipe">위로 쓸어올려서 잠금 해제</div>
-    </div>
 
-    <!-- 2. PASSCODE KEYPAD SCREEN -->
-    <div id="passcode-screen">
-        <div style="font-size:16px; font-weight:500;">암호 입력</div>
-        <div class="pass-dots" id="pass-dots">
-            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="keypad-grid">
-            <div class="key" onclick="pressPass('1')">1</div>
-            <div class="key" onclick="pressPass('2')">2</div>
-            <div class="key" onclick="pressPass('3')">3</div>
-            <div class="key" onclick="pressPass('4')">4</div>
-            <div class="key" onclick="pressPass('5')">5</div>
-            <div class="key" onclick="pressPass('6')">6</div>
-            <div class="key" onclick="pressPass('7')">7</div>
-            <div class="key" onclick="pressPass('8')">8</div>
-            <div class="key" onclick="pressPass('9')">9</div>
-            <div class="key" style="grid-column:2;" onclick="pressPass('0')">0</div>
-        </div>
-    </div>
-
-    <!-- 3. HOME SCREEN -->
-    <div id="home-screen">
-        <div class="app-grid" id="main-app-grid"></div>
-        <div class="dock" id="dock-app-grid"></div>
-    </div>
-
-    <!-- 4. APP VIEW (Inside App System) -->
-    <div class="app-view" id="app-view">
-        <div class="app-header">
-            <span style="color:#007aff; cursor:pointer;" onclick="closeAppView()">‹ 홈으로</span>
-            <span id="app-view-title">앱</span>
-            <span></span>
-        </div>
-        <div class="app-body" id="app-view-body"></div>
-    </div>
-
-    <!-- 5. FULL CUSTOM EDITOR MODAL -->
-    <div id="config-modal">
-        <h2 style="margin-bottom:15px; font-size:20px;">세계관 & 스마트폰 커스텀</h2>
-        <div style="overflow-y:auto; flex:1; padding-right:5px;">
-            
-            <div class="config-card">
-                <h3>🔒 잠금화면 & 배경 설정</h3>
-                <div class="input-group">
-                    <label>잠금화면 배경 이미지 URL</label>
-                    <input type="text" id="cfg-lock-bg">
-                </div>
-                <div class="input-group">
-                    <label>홈화면 배경 이미지 URL</label>
-                    <input type="text" id="cfg-home-bg">
-                </div>
-                <div class="input-group">
-                    <label>잠금 비밀번호 (4자리)</label>
-                    <input type="text" id="cfg-passcode" maxlength="4">
-                </div>
+        <!-- 1. Lock Screen -->
+        <div class="screen active" id="lock-screen" onclick="openPasscode()">
+            <div>
+                <div class="lock-date" id="lk-date">10월 24일 토요일</div>
+                <div class="lock-time" id="lk-time">09:41</div>
             </div>
-
-            <div class="config-card">
-                <h3>💬 카카오톡 메시지 커스텀</h3>
-                <div class="input-group">
-                    <label>상대방 이름</label>
-                    <input type="text" id="cfg-kakao-name">
-                </div>
-                <div class="input-group">
-                    <label>대화 내역 (줄바꿈으로 구분)</label>
-                    <textarea id="cfg-kakao-chat" rows="4"></textarea>
-                </div>
-            </div>
-
-            <div class="config-card">
-                <h3>📝 메모장 내용 커스텀</h3>
-                <div class="input-group">
-                    <label>비밀 메모 내용</label>
-                    <textarea id="cfg-memo-text" rows="4"></textarea>
-                </div>
-            </div>
-
-            <div class="config-card">
-                <h3>🖼️ 갤러리 이미지 URL 추가</h3>
-                <div class="input-group">
-                    <label>이미지 주소 (쉼표 , 로 여러개 구분)</label>
-                    <textarea id="cfg-gallery-urls" rows="3"></textarea>
-                </div>
-            </div>
-
+            <div style="font-size: 12px; opacity: 0.8;">화면을 터치하여 잠금해제</div>
         </div>
-        <button class="btn-close-config" onclick="saveAndCloseConfig()">저장 및 적용하기</button>
+
+        <!-- 2. Passcode Screen -->
+        <div class="screen" id="passcode-screen">
+            <div style="font-size:14px;">비밀번호 입력</div>
+            <div class="pass-dots" id="p-dots">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="keypad">
+                <div class="key" onclick="pressKey('1')">1</div>
+                <div class="key" onclick="pressKey('2')">2</div>
+                <div class="key" onclick="pressKey('3')">3</div>
+                <div class="key" onclick="pressKey('4')">4</div>
+                <div class="key" onclick="pressKey('5')">5</div>
+                <div class="key" onclick="pressKey('6')">6</div>
+                <div class="key" onclick="pressKey('7')">7</div>
+                <div class="key" onclick="pressKey('8')">8</div>
+                <div class="key" onclick="pressKey('9')">9</div>
+                <div class="key" style="grid-column: 2;" onclick="pressKey('0')">0</div>
+            </div>
+        </div>
+
+        <!-- 3. Home Screen -->
+        <div class="screen" id="home-screen">
+            <div class="app-grid" id="main-grid"></div>
+            <div class="dock" id="dock-grid"></div>
+        </div>
+
+        <!-- 4. Inside App View -->
+        <div class="app-view" id="app-view">
+            <div class="app-view-header">
+                <span style="color:#007aff; cursor:pointer;" onclick="closeApp()">‹ 뒤로</span>
+                <span id="app-title">앱</span>
+                <span></span>
+            </div>
+            <div class="app-view-body" id="app-body"></div>
+        </div>
     </div>
-</div>
+
+    <!-- 🛠️ EDITOR DASHBOARD -->
+    <div class="editor-dashboard">
+        <div class="editor-tabs">
+            <div class="tab-btn active" onclick="switchTab(0, 'p-bg')">🖼️</div>
+            <div class="tab-btn" onclick="switchTab(1, 'p-icons')">📱</div>
+            <div class="tab-btn" onclick="switchTab(2, 'p-apps')">💬</div>
+            <div class="tab-btn" onclick="switchTab(3, 'p-notes')">📝</div>
+            <div class="tab-btn" onclick="switchTab(4, 'p-cal')">📅</div>
+        </div>
+
+        <!-- Tab 0: Backgrounds & Lock -->
+        <div class="panel active" id="panel-p-bg">
+            <div class="panel-title">배경화면 및 보안</div>
+            <div class="f-group"><label>잠금화면 배경 URL</label><input type="text" class="f-input" id="cfg-lock-bg" oninput="sync()"></div>
+            <div class="f-group"><label>홈화면 배경 URL</label><input type="text" class="f-input" id="cfg-home-bg" oninput="sync()"></div>
+            <div class="f-group"><label>잠금 비밀번호 (4자리)</label><input type="text" class="f-input" id="cfg-pass" maxlength="4" oninput="sync()"></div>
+        </div>
+
+        <!-- Tab 1: App Covers -->
+        <div class="panel" id="panel-p-icons">
+            <div class="panel-title">앱 아이콘(커버) 커스텀</div>
+            <div class="f-group"><label>메모 앱 아이콘 (이모지 또는 URL)</label><input type="text" class="f-input" id="icon-memo" oninput="sync()"></div>
+            <div class="f-group"><label>사진 앱 아이콘</label><input type="text" class="f-input" id="icon-gallery" oninput="sync()"></div>
+            <div class="f-group"><label>카메라 앱 아이콘</label><input type="text" class="f-input" id="icon-camera" oninput="sync()"></div>
+            <div class="f-group"><label>캘린더 앱 아이콘</label><input type="text" class="f-input" id="icon-calendar" oninput="sync()"></div>
+            <div class="f-group"><label>전화 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-phone" oninput="sync()"></div>
+            <div class="f-group"><label>카카오톡 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-kakao" oninput="sync()"></div>
+            <div class="f-group"><label>음악 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-music" oninput="sync()"></div>
+            <div class="f-group"><label>인터넷 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-safari" oninput="sync()"></div>
+        </div>
+
+        <!-- Tab 2: Kakao & Call -->
+        <div class="panel" id="panel-p-apps">
+            <div class="panel-title">카카오톡 & 전화 시스템 세팅</div>
+            <div class="f-group"><label>카카오톡 상대방 이름</label><input type="text" class="f-input" id="cfg-kakao-name" oninput="sync()"></div>
+            <div class="f-group"><label>카카오톡 대화 내용 (줄바꿈 구분)</label><textarea class="f-input" id="cfg-kakao-chat" rows="3" oninput="sync()"></textarea></div>
+        </div>
+
+        <!-- Tab 3: Notes & Gallery -->
+        <div class="panel" id="panel-p-notes">
+            <div class="panel-title">메모장 & 사진 앨범 세팅</div>
+            <div class="f-group"><label>메모장 내용</label><textarea class="f-input" id="cfg-memo" rows="3" oninput="sync()"></textarea></div>
+            <div class="f-group"><label>사진 앨범 이미지 URL (콤마로 구분)</label><input type="text" class="f-input" id="cfg-photos" oninput="sync()"></div>
+        </div>
+
+        <!-- Tab 4: Calendar & Music -->
+        <div class="panel" id="panel-p-cal">
+            <div class="panel-title">캘린더 & 음악 세팅</div>
+            <div class="f-group"><label>캘린더 일정 내용</label><input type="text" class="f-input" id="cfg-cal" oninput="sync()"></div>
+            <div class="f-group"><label>음악 플레이어 (곡 제목 / 가수)</label><input type="text" class="f-input" id="cfg-music" oninput="sync()"></div>
+        </div>
+    </div>
 
 <script>
-    // System LocalStorage State
-    let state = JSON.parse(localStorage.getItem('ios_sim_state')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
-        passcode: '1234',
+        pass: '1234',
+        icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' },
         kakaoName: '수빈',
-        kakaoChat: '오늘 저녁에 시간 돼?\n응! 어디서 볼까?\n보통 보던 카페에서 봐!',
-        memoText: '📌 비밀 리스트\n- 선물 사기\n- 약속 장소 예약하기',
-        galleryUrls: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500,https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500'
+        kakaoChat: '오늘 저녁에 봐!\n응 알겠어 장소로 갈게.',
+        memo: '비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음',
+        photos: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500, https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500',
+        cal: '12월 5일: 중요한 데이트',
+        musicInfo: 'Attention - NewJeans'
     };
 
-    let enteredPass = '';
+    let passInput = '';
 
-    // Save & Load State
-    function saveState() {
-        localStorage.setItem('ios_sim_state', JSON.stringify(state));
+    function sync() {
+        db.lockBg = document.getElementById('cfg-lock-bg').value;
+        db.homeBg = document.getElementById('cfg-home-bg').value;
+        db.pass = document.getElementById('cfg-pass').value;
+        db.icons.memo = document.getElementById('icon-memo').value;
+        db.icons.gallery = document.getElementById('icon-gallery').value;
+        db.icons.camera = document.getElementById('icon-camera').value;
+        db.icons.calendar = document.getElementById('icon-calendar').value;
+        db.icons.phone = document.getElementById('icon-phone').value;
+        db.icons.kakao = document.getElementById('icon-kakao').value;
+        db.icons.music = document.getElementById('icon-music').value;
+        db.icons.safari = document.getElementById('icon-safari').value;
+        db.kakaoName = document.getElementById('cfg-kakao-name').value;
+        db.kakaoChat = document.getElementById('cfg-kakao-chat').value;
+        db.memo = document.getElementById('cfg-memo').value;
+        db.photos = document.getElementById('cfg-photos').value;
+        db.cal = document.getElementById('cfg-cal').value;
+        db.musicInfo = document.getElementById('cfg-music').value;
+
+        localStorage.setItem('ios_world_db', JSON.stringify(db));
+        renderPhone();
     }
 
-    // Render Phone UI
-    function render() {
-        document.getElementById('lock-screen').style.backgroundImage = `url('${state.lockBg}')`;
-        document.getElementById('home-screen').style.backgroundImage = `url('${state.homeBg}')`;
+    function renderPhone() {
+        document.getElementById('lock-screen').style.backgroundImage = `url('${db.lockBg}')`;
+        document.getElementById('home-screen').style.backgroundImage = `url('${db.homeBg}')`;
 
-        // Render Home Apps
-        const apps = [
-            { id: 'phone', name: '전화', icon: '📞', bg: '#34c759' },
-            { id: 'kakao', name: '카카오톡', icon: '💬', bg: '#fee500' },
-            { id: 'memo', name: '메모', icon: '📝', bg: '#ffffff' },
-            { id: 'gallery', name: '갤러리', icon: '🖼️', bg: '#ffffff' },
-            { id: 'camera', name: '카메라', icon: '📷', bg: '#8e8e93' },
-            { id: 'calendar', name: '캘린더', icon: '📅', bg: '#ffffff' },
-            { id: 'insta', name: '인스타그램', icon: '📸', bg: '#ff2d55' },
-            { id: 'settings', name: '설정', icon: '⚙️', bg: '#8e8e93' }
+        // Main Grid Apps (메모, 사진, 카메라, 캘린더)
+        const mainApps = [
+            { id: 'memo', name: '메모', icon: db.icons.memo },
+            { id: 'gallery', name: '사진', icon: db.icons.gallery },
+            { id: 'camera', name: '카메라', icon: db.icons.camera },
+            { id: 'calendar', name: '캘린더', icon: db.icons.calendar }
         ];
 
-        const mainGrid = document.getElementById('main-app-grid');
-        const dockGrid = document.getElementById('dock-app-grid');
-        mainGrid.innerHTML = ''; dockGrid.innerHTML = '';
+        // Dock Apps (전화, 카카오톡, 음악, 인터넷)
+        const dockApps = [
+            { id: 'phone', name: '전화', icon: db.icons.phone },
+            { id: 'kakao', name: '카카오톡', icon: db.icons.kakao },
+            { id: 'music', name: '음악', icon: db.icons.music },
+            { id: 'safari', name: '인터넷', icon: db.icons.safari }
+        ];
 
-        apps.forEach((app, idx) => {
-            const item = document.createElement('div');
-            item.className = 'app-item';
-            item.onclick = () => openAppSystem(app.id);
-            item.innerHTML = `
-                <div class="app-icon" style="background-color: ${app.bg};">${app.icon}</div>
-                <div class="app-label">${app.name}</div>
-            `;
-            if (idx < 4) dockGrid.appendChild(item);
-            else mainGrid.appendChild(item);
-        });
+        const mGrid = document.getElementById('main-grid');
+        const dGrid = document.getElementById('dock-grid');
+        mGrid.innerHTML = ''; dGrid.innerHTML = '';
+
+        mainApps.forEach(a => mGrid.appendChild(createAppNode(a)));
+        dockApps.forEach(a => dGrid.appendChild(createAppNode(a)));
     }
 
-    // Swipe Gesture Detection for Unlock
-    let startY = 0;
-    const lockScreen = document.getElementById('lock-screen');
+    function createAppNode(app) {
+        const item = document.createElement('div');
+        item.className = 'app-item';
+        item.onclick = () => openApp(app.id);
+        const isImg = app.icon.startsWith('http');
+        const bgStyle = isImg ? `background-image: url('${app.icon}'); background-size: cover;` : 'background: rgba(255,255,255,0.3); backdrop-filter:blur(10px);';
+        const txt = isImg ? '' : app.icon;
 
-    lockScreen.addEventListener('touchstart', (e) => startY = e.touches[0].clientY);
-    lockScreen.addEventListener('touchend', (e) => {
-        let endY = e.changedTouches[0].clientY;
-        if (startY - endY > 50) showPasscode();
-    });
-    lockScreen.addEventListener('click', () => showPasscode());
+        item.innerHTML = `<div class="app-icon" style="${bgStyle}">${txt}</div><div class="app-label">${app.name}</div>`;
+        return item;
+    }
 
-    function showPasscode() {
+    function switchTab(idx, panelId) {
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        document.getElementById('panel-' + panelId).classList.add('active');
+    }
+
+    function openPasscode() {
+        document.getElementById('lock-screen').classList.remove('active');
         document.getElementById('passcode-screen').classList.add('active');
-        enteredPass = '';
-        updateDots();
+        passInput = ''; updateDots();
     }
 
-    function pressPass(num) {
-        if (enteredPass.length < 4) {
-            enteredPass += num;
-            updateDots();
-            if (enteredPass.length === 4) {
+    function pressKey(num) {
+        if (passInput.length < 4) {
+            passInput += num; updateDots();
+            if (passInput.length === 4) {
                 setTimeout(() => {
-                    if (enteredPass === state.passcode) {
+                    if (passInput === db.pass) {
                         document.getElementById('passcode-screen').classList.remove('active');
-                        document.getElementById('lock-screen').classList.add('unlocked');
+                        document.getElementById('home-screen').classList.add('active');
                     } else {
-                        alert('비밀번호가 올바르지 않습니다.');
-                        enteredPass = '';
-                        updateDots();
+                        alert('비밀번호가 틀렸습니다.'); passInput = ''; updateDots();
                     }
                 }, 100);
             }
@@ -373,90 +353,94 @@
     }
 
     function updateDots() {
-        const dots = document.querySelectorAll('.dot');
-        dots.forEach((d, i) => d.classList.toggle('filled', i < enteredPass.length));
+        document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('filled', i < passInput.length));
     }
 
-    // Inside Apps Logic
-    function openAppSystem(appId) {
+    // App Real Systems Implementation
+    function openApp(id) {
         const view = document.getElementById('app-view');
-        const body = document.getElementById('app-view-body');
-        const title = document.getElementById('app-view-title');
+        const body = document.getElementById('app-body');
+        const title = document.getElementById('app-title');
 
-        if (appId === 'kakao') {
-            title.innerText = state.kakaoName;
-            const chatList = state.kakaoChat.split('\n');
-            body.innerHTML = chatList.map(c => `
-                <div style="background:#fee500; color:#000; padding:10px 14px; border-radius:12px; margin-bottom:8px; max-width:80%; font-size:14px;">
-                    ${c}
-                </div>
-            `).join('');
-        } else if (appId === 'memo') {
-            title.innerText = '메모장';
-            body.innerHTML = `<pre style="font-size:15px; white-space:pre-wrap; line-height:1.6;">${state.memoText}</pre>`;
-        } else if (appId === 'gallery') {
-            title.innerText = '갤러리';
-            const urls = state.galleryUrls.split(',');
-            body.innerHTML = `<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:4px;">
-                ${urls.map(u => `<img src="${u.trim()}" style="width:100%; height:110px; object-fit:cover; border-radius:4px;">`).join('')}
+        if (id === 'memo') {
+            title.innerText = '메모';
+            body.innerHTML = `<textarea style="width:100%; height:100%; border:none; background:transparent; font-size:15px; outline:none;" readonly>${db.memo}</textarea>`;
+        } else if (id === 'gallery') {
+            title.innerText = '사진';
+            const urls = db.photos.split(',');
+            body.innerHTML = `<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;">
+                ${urls.map(u => `<img src="${u.trim()}" style="width:100%; height:110px; object-fit:cover; border-radius:6px;">`).join('')}
             </div>`;
-        } else if (appId === 'settings') {
-            openConfigModal();
-            return;
-        } else {
-            title.innerText = appId.toUpperCase();
-            body.innerHTML = `<div style="text-align:center; padding-top:50px; opacity:0.6;">${appId} 시스템 작동 중...</div>`;
+        } else if (id === 'camera') {
+            title.innerText = '카메라';
+            body.innerHTML = `<div style="background:#000; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; border-radius:12px;">
+                <div style="font-size:40px; margin-bottom:20px;">📷</div>
+                <div style="border:4px solid #fff; width:60px; height:60px; border-radius:50%; cursor:pointer;" onclick="alert('찰칵! 사진이 저장되었습니다.')"></div>
+            </div>`;
+        } else if (id === 'calendar') {
+            title.innerText = '캘린더';
+            body.innerHTML = `<div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <h3 style="color:#ff3b30; margin-bottom:8px;">오늘의 일정</h3>
+                <p style="font-size:14px;">${db.cal}</p>
+            </div>`;
+        } else if (id === 'phone') {
+            title.innerText = '전화';
+            body.innerHTML = `<div style="text-align:center; padding-top:20px;">
+                <div style="font-size:24px; font-weight:600; margin-bottom:20px;" id="dial-num">010-1234-5678</div>
+                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; width:80%; margin:auto;">
+                    ${['1','2','3','4','5','6','7','8','9','*','0','#'].map(n => `<div style="background:#e5e5ea; padding:15px; border-radius:50%; font-size:18px; font-weight:600; cursor:pointer;" onclick="document.getElementById('dial-num').innerText+='${n}'">${n}</div>`).join('')}
+                </div>
+            </div>`;
+        } else if (id === 'kakao') {
+            title.innerText = db.kakaoName;
+            body.innerHTML = db.kakaoChat.split('\n').map(t => `
+                <div style="background:#fee500; color:#000; padding:10px 14px; border-radius:14px; margin-bottom:8px; max-width:80%; font-size:14px;">${t}</div>
+            `).join('');
+        } else if (id === 'music') {
+            title.innerText = '음악';
+            body.innerHTML = `<div style="text-align:center; padding-top:40px;">
+                <div style="font-size:60px; margin-bottom:20px;">🎵</div>
+                <h3 style="font-size:18px; margin-bottom:10px;">${db.musicInfo}</h3>
+                <p style="font-size:13px; color:#8e8e93; margin-bottom:30px;">Apple Music 재생 중</p>
+                <div style="font-size:28px; display:flex; justify-content:center; gap:20px; cursor:pointer;">
+                    <span>⏮️</span><span onclick="alert('재생/일시정지')">⏸️</span><span>⏭️</span>
+                </div>
+            </div>`;
+        } else if (id === 'safari') {
+            title.innerText = '인터넷 (Safari)';
+            body.innerHTML = `<div>
+                <input type="text" value="https://www.google.com" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; background:#e5e5ea; font-size:13px; text-align:center; margin-bottom:20px;" readonly>
+                <div style="text-align:center; padding-top:50px; opacity:0.6;">안전한 브라우징 모드</div>
+            </div>`;
         }
 
         view.classList.add('active');
     }
 
-    function closeAppView() {
+    function closeApp() {
         document.getElementById('app-view').classList.remove('active');
     }
 
-    // Config Modal Controls
-    function openConfigModal() {
-        document.getElementById('cfg-lock-bg').value = state.lockBg;
-        document.getElementById('cfg-home-bg').value = state.homeBg;
-        document.getElementById('cfg-passcode').value = state.passcode;
-        document.getElementById('cfg-kakao-name').value = state.kakaoName;
-        document.getElementById('cfg-kakao-chat').value = state.kakaoChat;
-        document.getElementById('cfg-memo-text').value = state.memoText;
-        document.getElementById('cfg-gallery-urls').value = state.galleryUrls;
+    // Init Inputs
+    document.getElementById('cfg-lock-bg').value = db.lockBg;
+    document.getElementById('cfg-home-bg').value = db.homeBg;
+    document.getElementById('cfg-pass').value = db.pass;
+    document.getElementById('icon-memo').value = db.icons.memo;
+    document.getElementById('icon-gallery').value = db.icons.gallery;
+    document.getElementById('icon-camera').value = db.icons.camera;
+    document.getElementById('icon-calendar').value = db.icons.calendar;
+    document.getElementById('icon-phone').value = db.icons.phone;
+    document.getElementById('icon-kakao').value = db.icons.kakao;
+    document.getElementById('icon-music').value = db.icons.music;
+    document.getElementById('icon-safari').value = db.icons.safari;
+    document.getElementById('cfg-kakao-name').value = db.kakaoName;
+    document.getElementById('cfg-kakao-chat').value = db.kakaoChat;
+    document.getElementById('cfg-memo').value = db.memo;
+    document.getElementById('cfg-photos').value = db.photos;
+    document.getElementById('cfg-cal').value = db.cal;
+    document.getElementById('cfg-music').value = db.musicInfo;
 
-        document.getElementById('config-modal').classList.add('active');
-    }
-
-    function saveAndCloseConfig() {
-        state.lockBg = document.getElementById('cfg-lock-bg').value;
-        state.homeBg = document.getElementById('cfg-home-bg').value;
-        state.passcode = document.getElementById('cfg-passcode').value;
-        state.kakaoName = document.getElementById('cfg-kakao-name').value;
-        state.kakaoChat = document.getElementById('cfg-kakao-chat').value;
-        state.memoText = document.getElementById('cfg-memo-text').value;
-        state.galleryUrls = document.getElementById('cfg-gallery-urls').value;
-
-        saveState();
-        render();
-        document.getElementById('config-modal').classList.remove('active');
-        alert('설정이 저장되었습니다!');
-    }
-
-    // Live Clock Update
-    function updateClock() {
-        const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const mins = String(now.getMinutes()).padStart(2, '0');
-        const timeStr = `${hours}:${mins}`;
-        document.getElementById('st-time').innerText = timeStr;
-        document.getElementById('lk-time').innerText = timeStr;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Initial Launch
-    render();
+    renderPhone();
 </script>
 </body>
 </html>

@@ -36,28 +36,41 @@
 
         /* 📱 LIVE PHONE (세계관 속 실제 폰) */
         .iphone-frame {
-            width: 100%; max-width: 380px; height: 720px;
-            margin: 20px 0; border-radius: 44px; border: 10px solid #1c1c1e;
+            width: 100%; max-width: 380px; height: 740px;
+            margin: 20px 0; border-radius: 48px; border: 12px solid #1c1c1e;
             position: relative; overflow: hidden;
             background-size: cover; background-position: center;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
         }
 
-        /* iOS Real Status Bar (통일되고 커진 폰트 & 배터리) */
+        /* Dynamic Island (다이내믹 아일랜드) */
+        .dynamic-island {
+            position: absolute;
+            top: 10px; left: 50%;
+            transform: translateX(-50%);
+            width: 110px; height: 28px;
+            background-color: #000;
+            border-radius: 20px;
+            z-index: 550;
+        }
+
+        /* iOS Real Status Bar (키워진 아이콘 크기 & 세로 4줄 셀룰러) */
         .status-bar {
-            position: absolute; top: 0; width: 100%; height: 44px;
-            padding: 0 22px; display: flex; justify-content: space-between; align-items: center;
-            font-size: 14px; font-weight: 600; color: #fff; z-index: 500;
+            position: absolute; top: 0; width: 100%; height: 48px;
+            padding: 0 24px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 15px; font-weight: 600; color: #fff; z-index: 500;
             text-shadow: 0 1px 3px rgba(0,0,0,0.7);
         }
-        .status-icons { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .status-icons { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+        .signal-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
+        .signal-bar { width: 3px; background: #fff; border-radius: 1px; }
         .battery-box {
-            width: 25px; height: 13px; border: 1.5px solid #fff; border-radius: 3.5px;
-            padding: 1px; display: flex; align-items: center; position: relative;
+            width: 27px; height: 14px; border: 1.5px solid #fff; border-radius: 4px;
+            padding: 1.5px; display: flex; align-items: center; position: relative;
         }
         .battery-level { width: 100%; height: 100%; background: #fff; border-radius: 1px; }
         .battery-tip {
-            position: absolute; right: -3.5px; top: 3.5px; width: 2px; height: 4px;
+            position: absolute; right: -4px; top: 3.5px; width: 2px; height: 4.5px;
             background: #fff; border-radius: 0 1px 1px 0;
         }
 
@@ -65,38 +78,55 @@
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* Lock Screen */
+        /* Lock Screen (부드러운 슬라이드 애니메이션) */
         #lock-screen {
             justify-content: space-between; align-items: center;
-            padding: 70px 20px 40px; text-align: center; color: #fff;
-            background-size: cover; background-position: center; cursor: pointer;
+            padding: 75px 20px 30px; text-align: center; color: #fff;
+            background-size: cover; background-position: center;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            touch-action: none;
         }
-        .lock-date { font-size: 18px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        .lock-time { font-size: 76px; font-weight: 200; letter-spacing: -2px; margin-top: -5px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        #lock-screen.swiped {
+            transform: translateY(-100%);
+        }
+        .lock-date { font-size: 19px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .lock-time { font-size: 82px; font-weight: 200; letter-spacing: -2px; margin-top: -6px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        .home-indicator-bar {
+            width: 135px; height: 5px; background: #fff; border-radius: 3px;
+            margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            animation: bounceIndicator 2s infinite;
+        }
 
-        /* Passcode Screen */
+        @keyframes bounceIndicator {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Passcode Screen (더 크고 동그란 버튼) */
         #passcode-screen {
-            background: rgba(0,0,0,0.75); backdrop-filter: blur(30px);
-            color: #fff; justify-content: center; align-items: center; gap: 20px; z-index: 600;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(35px);
+            color: #fff; justify-content: center; align-items: center; gap: 24px; z-index: 600;
         }
-        .pass-dots { display: flex; gap: 14px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #fff; }
+        .pass-dots { display: flex; gap: 16px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; }
         .dot.filled { background: #fff; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 75%; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 20px; width: 78%; }
         .key {
-            width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2);
-            display: flex; justify-content: center; align-items: center; font-size: 24px; margin: auto; cursor: pointer;
+            width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.22);
+            display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: 400;
+            margin: auto; cursor: pointer; transition: background 0.15s ease;
         }
+        .key:active { background: rgba(255,255,255,0.45); }
 
         /* Home Screen */
         #home-screen {
             background-size: cover; background-position: center;
-            padding: 55px 16px 20px; justify-content: space-between;
+            padding: 60px 16px 20px; justify-content: space-between;
         }
         .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; }
         .app-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .app-icon {
-            width: 56px; height: 56px; border-radius: 14px;
+            width: 58px; height: 58px; border-radius: 14px;
             display: flex; justify-content: center; align-items: center; font-size: 26px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-size: cover; background-position: center;
         }
@@ -119,7 +149,7 @@
         }
         .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #f2f2f7; }
 
-        /* 🛠️ EDITOR DASHBOARD (완전 분리된 제어판) */
+        /* 🛠️ EDITOR DASHBOARD */
         .editor-dashboard {
             width: 100%; max-width: 480px; background: #ffffff;
             border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
@@ -153,28 +183,42 @@
 
     <!-- 📱 LIVE PHONE -->
     <div class="iphone-frame" id="phone-root">
+        <!-- Dynamic Island -->
+        <div class="dynamic-island"></div>
+
+        <!-- Real Status Bar -->
         <div class="status-bar">
             <span id="st-time">09:41</span>
             <div class="status-icons">
-                <span>􀛨 LTE</span>
+                <!-- 4 Signal Bars -->
+                <div class="signal-bars">
+                    <div class="signal-bar" style="height: 3px;"></div>
+                    <div class="signal-bar" style="height: 6px;"></div>
+                    <div class="signal-bar" style="height: 9px;"></div>
+                    <div class="signal-bar" style="height: 12px;"></div>
+                </div>
+                <span>5G</span>
                 <div class="battery-box"><div class="battery-level"></div><div class="battery-tip"></div></div>
             </div>
         </div>
 
-        <!-- 1. Lock Screen -->
-        <div class="screen active" id="lock-screen" onclick="openPasscode()">
+        <!-- 1. Lock Screen (Swipe Up Event) -->
+        <div class="screen active" id="lock-screen">
             <div>
                 <div class="lock-date" id="lk-date">10월 24일 토요일</div>
                 <div class="lock-time" id="lk-time">09:41</div>
             </div>
-            <div style="font-size: 12px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">화면을 터치하여 잠금해제</div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+                <div style="font-size: 12px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">위로 쓸어올려서 잠금해제</div>
+                <div class="home-indicator-bar"></div>
+            </div>
         </div>
 
-        <!-- 2. Passcode Screen (빈 공간 터치 시 잠금화면으로 복귀) -->
+        <!-- 2. Passcode Screen -->
         <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
             <div style="text-align: center; z-index: 10;" id="passcode-inner-box">
-                <div style="font-size:14px; margin-bottom: 15px;">비밀번호 입력</div>
-                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 20px;">
+                <div style="font-size:15px; font-weight: 500; margin-bottom: 18px;">비밀번호 입력</div>
+                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 24px;">
                     <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
                 <div class="keypad">
@@ -209,7 +253,7 @@
         </div>
     </div>
 
-    <!-- 🛠️ EDITOR DASHBOARD (앱별 완벽 개별 분류 제어판) -->
+    <!-- 🛠️ EDITOR DASHBOARD -->
     <div class="editor-dashboard">
         <div class="editor-tabs">
             <div class="tab-btn active" onclick="switchTab(0, 'lock')">🔒</div>
@@ -263,7 +307,7 @@
 응 알겠어 장소로 갈게.</textarea></div>
         </div>
 
-        <!-- Tab 5: More Apps (Instagram, Calendar, Music, Call) -->
+        <!-- Tab 5: More Apps -->
         <div class="panel" id="panel-more">
             <div class="panel-title">✨ 기타 앱 개별 설정</div>
             <div class="f-group"><label>인스타그램 피드 내용</label><input type="text" class="f-input" id="cfg-insta" value="오늘 하늘 예쁘다 ☁️" oninput="sync()"></div>
@@ -273,7 +317,7 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v3')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v4')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
@@ -290,7 +334,7 @@
 
     let passInput = '';
 
-    // Realtime Clock System
+    // Realtime Clock System (현실 시간 연동)
     function updateRealtimeClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -303,7 +347,65 @@
     setInterval(updateRealtimeClock, 1000);
     updateRealtimeClock();
 
-    // Handle File Uploads (Base64)
+    // Swipe Up Gesture for Unlock (아래에서 위로 쓸어올리기)
+    const lockScreen = document.getElementById('lock-screen');
+    let startY = 0;
+    let isSwiping = false;
+
+    lockScreen.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        isSwiping = true;
+    });
+
+    lockScreen.addEventListener('touchmove', (e) => {
+        if (!isSwiping) return;
+        let currentY = e.touches[0].clientY;
+        let diffY = startY - currentY;
+        if (diffY > 0 && diffY < 200) {
+            lockScreen.style.transform = `translateY(-${diffY}px)`;
+        }
+    });
+
+    lockScreen.addEventListener('touchend', (e) => {
+        if (!isSwiping) return;
+        let endY = e.changedTouches[0].clientY;
+        if (startY - endY > 60) {
+            triggerPasscodeScreen();
+        } else {
+            lockScreen.style.transform = 'translateY(0)';
+        }
+        isSwiping = false;
+    });
+
+    // Mouse Fallback for Desktop Test
+    lockScreen.addEventListener('mousedown', (e) => {
+        startY = e.clientY;
+        isSwiping = true;
+    });
+    lockScreen.addEventListener('mouseup', (e) => {
+        if (!isSwiping) return;
+        if (startY - e.clientY > 40) {
+            triggerPasscodeScreen();
+        }
+        isSwiping = false;
+    });
+
+    function triggerPasscodeScreen() {
+        lockScreen.classList.add('swiped');
+        setTimeout(() => {
+            document.getElementById('passcode-screen').classList.add('active');
+            passInput = ''; updateDots();
+        }, 150);
+    }
+
+    function checkOutsidePassClick(e) {
+        if (e.target.id === 'passcode-screen') {
+            document.getElementById('passcode-screen').classList.remove('active');
+            lockScreen.classList.remove('swiped');
+            lockScreen.style.transform = 'translateY(0)';
+        }
+    }
+
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -351,7 +453,7 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('ios_world_db_v3', JSON.stringify(db));
+        localStorage.setItem('ios_world_db_v4', JSON.stringify(db));
         renderPhone();
     }
 
@@ -360,7 +462,6 @@
         document.getElementById('home-screen').style.backgroundImage = `url('${db.homeBg}')`;
         document.getElementById('lk-date').innerText = db.lockDate;
 
-        // Main Grid Apps (메모, 사진, 카메라, 캘린더, 인스타그램)
         const mainApps = [
             { id: 'memo', name: '메모', icon: db.icons.memo },
             { id: 'gallery', name: '사진', icon: db.icons.gallery },
@@ -369,7 +470,6 @@
             { id: 'insta', name: '인스타그램', icon: db.icons.insta }
         ];
 
-        // Dock Apps (전화, 카카오톡, 음악, 인터넷)
         const dockApps = [
             { id: 'phone', name: '전화', icon: db.icons.phone },
             { id: 'kakao', name: '카카오톡', icon: db.icons.kakao },
@@ -403,20 +503,6 @@
         document.getElementById('panel-' + panelId).classList.add('active');
     }
 
-    function openPasscode() {
-        document.getElementById('lock-screen').classList.remove('active');
-        document.getElementById('passcode-screen').classList.add('active');
-        passInput = ''; updateDots();
-    }
-
-    // Passcode Screen 빈 공간 터치 시 잠금화면으로 복귀
-    function checkOutsidePassClick(e) {
-        if (e.target.id === 'passcode-screen') {
-            document.getElementById('passcode-screen').classList.remove('active');
-            document.getElementById('lock-screen').classList.add('active');
-        }
-    }
-
     function pressKey(num) {
         if (passInput.length < 4) {
             passInput += num; updateDots();
@@ -437,7 +523,6 @@
         document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('filled', i < passInput.length));
     }
 
-    // App Real Systems
     function openApp(id) {
         const view = document.getElementById('app-view');
         const body = document.getElementById('app-body');

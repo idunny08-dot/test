@@ -21,12 +21,13 @@
             padding: 20px 0 50px;
         }
 
-        /* 폰 전용 링크 모드일 때 배경을 블랙으로 맞추고 스크롤 제거 */
+        /* 폰 전용 링크 모드일 때 에디터 공간을 아예 없애고 블랙 배경으로 풀스크린 정렬 */
         body.phone-only-mode {
             background-color: #000000 !important;
             justify-content: center !important;
+            align-items: center !important;
             padding: 0 !important;
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
         }
 
@@ -55,16 +56,17 @@
             position: relative; overflow: hidden;
             background-size: cover; background-position: center;
             box-shadow: 0 16px 40px rgba(0,0,0,0.25);
-            transition: transform 0.3s ease;
+            flex-shrink: 0;
         }
         
         body.phone-only-mode .iphone-frame {
-            margin: 0;
-            border: none;
-            border-radius: 0;
-            max-width: 420px;
-            height: 100vh;
-            box-shadow: none;
+            margin: 0 !important;
+            border: none !important;
+            border-radius: 0 !important;
+            width: 100% !important;
+            max-width: 420px !important;
+            height: 100vh !important;
+            box-shadow: none !important;
         }
 
         /* Dynamic Island */
@@ -126,7 +128,7 @@
             50% { transform: translateY(-5px); }
         }
 
-        /* Passcode Screen (반투명 키패드 버튼 및 아래로 내려간 하단 버튼 배치) */
+        /* Passcode Screen (원위치 고정 및 안정적인 정렬) */
         #passcode-screen {
             position: absolute; inset: 0;
             background: rgba(120, 120, 128, 0.45);
@@ -410,7 +412,6 @@
     </div>
 
 <script>
-    // URL 해시(데이터) 또는 로컬스토리지 연동 시스템
     let db = {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
@@ -427,7 +428,7 @@
                 if (parsed) return parsed;
             }
         } catch(e) {}
-        return JSON.parse(localStorage.getItem('ios_world_db_v15')) || db;
+        return JSON.parse(localStorage.getItem('ios_world_db_v16')) || db;
     }
 
     db = loadDatabase();
@@ -579,10 +580,9 @@
         saveAndRender();
     }
 
-    // 실시간 링크 업데이트(URL Hash 동기화) 기능 포함
     function saveAndRender() {
         try {
-            localStorage.setItem('ios_world_db_v15', JSON.stringify(db));
+            localStorage.setItem('ios_world_db_v16', JSON.stringify(db));
             const jsonStr = btoa(unescape(encodeURIComponent(JSON.stringify(db))));
             history.replaceState(null, '', '#' + jsonStr);
         } catch (e) {
@@ -733,12 +733,12 @@
     }
 
     function exportWorldLink() {
-        saveAndRender(); // 현재 상태를 해시에 반영
+        saveAndRender();
         const currentUrl = window.location.href.split('?')[0];
         const shareableLink = currentUrl + '?mode=phone_only' + window.location.hash;
         
         navigator.clipboard.writeText(shareableLink).then(() => {
-            alert('✨ 실시간 편집 내용이 반영된 순수 스마트폰 링크가 복사되었습니다!\n\n이 링크로 접속하면 폰 화면만 꽉 차게 조작할 수 있습니다.');
+            alert('✨ 편집기가 완전히 숨겨진 순수 폰 링크가 복사되었습니다!\n\n이 링크로 접속하면 폰 화면만 꽉 차게 작동합니다.');
         }).catch(() => {
             prompt('아래 링크를 복사하세요:', shareableLink);
         });

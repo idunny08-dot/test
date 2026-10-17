@@ -18,15 +18,15 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding-bottom: 50px;
+            padding: 20px 0 50px;
         }
 
         /* Top Studio Header */
         .studio-header {
-            width: 100%; max-width: 480px; padding: 14px 20px;
+            width: 100%; max-width: 440px; padding: 12px 20px;
             display: flex; justify-content: space-between; align-items: center;
             background: #fff; border-bottom: 1px solid #e5e5ea;
-            position: sticky; top: 0; z-index: 1000;
+            position: sticky; top: 0; z-index: 1000; border-radius: 14px 14px 0 0;
         }
         .studio-title { font-size: 15px; font-weight: 700; }
         .btn-export {
@@ -34,13 +34,13 @@
             padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
         }
 
-        /* 📱 LIVE PHONE (세계관 속 실제 폰) */
+        /* 📱 LIVE PHONE (여유 있는 크기 설정) */
         .iphone-frame {
-            width: 100%; max-width: 380px; height: 740px;
-            margin: 20px 0; border-radius: 48px; border: 12px solid #1c1c1e;
+            width: 100%; max-width: 350px; height: 680px;
+            margin: 15px 0; border-radius: 44px; border: 10px solid #1c1c1e;
             position: relative; overflow: hidden;
             background-size: cover; background-position: center;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.2);
         }
 
         /* Dynamic Island */
@@ -48,29 +48,29 @@
             position: absolute;
             top: 10px; left: 50%;
             transform: translateX(-50%);
-            width: 110px; height: 28px;
+            width: 105px; height: 26px;
             background-color: #000;
-            border-radius: 20px;
+            border-radius: 18px;
             z-index: 550;
         }
 
-        /* Status Bar */
+        /* Status Bar (다이내믹 아일랜드와 완벽한 간격 조화) */
         .status-bar {
-            position: absolute; top: 0; width: 100%; height: 48px;
-            padding: 0 24px; display: flex; justify-content: space-between; align-items: center;
-            font-size: 15px; font-weight: 600; color: #fff; z-index: 500;
+            position: absolute; top: 0; width: 100%; height: 46px;
+            padding: 0 22px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; font-weight: 600; color: #fff; z-index: 500;
             text-shadow: 0 1px 3px rgba(0,0,0,0.7);
         }
-        .status-icons { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-        .signal-bars { display: flex; align-items: flex-end; gap: 2px; height: 12px; }
-        .signal-bar { width: 3px; background: #fff; border-radius: 1px; }
+        .status-icons { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .signal-bars { display: flex; align-items: flex-end; gap: 2px; height: 11px; }
+        .signal-bar { width: 2.5px; background: #fff; border-radius: 1px; }
         .battery-box {
-            width: 27px; height: 14px; border: 1.5px solid #fff; border-radius: 4px;
-            padding: 1.5px; display: flex; align-items: center; position: relative;
+            width: 24px; height: 12px; border: 1.5px solid #fff; border-radius: 3.5px;
+            padding: 1px; display: flex; align-items: center; position: relative;
         }
         .battery-level { width: 100%; height: 100%; background: #fff; border-radius: 1px; }
         .battery-tip {
-            position: absolute; right: -4px; top: 3.5px; width: 2px; height: 4.5px;
+            position: absolute; right: -3.5px; top: 3px; width: 1.5px; height: 4px;
             background: #fff; border-radius: 0 1px 1px 0;
         }
 
@@ -78,40 +78,40 @@
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* Lock Screen (부드러운 슬라이딩 엔진 적용) */
+        /* Lock Screen */
         #lock-screen {
             justify-content: space-between; align-items: center;
-            padding: 75px 20px 30px; text-align: center; color: #fff;
+            padding: 70px 20px 25px; text-align: center; color: #fff;
             background-size: cover; background-position: center;
             transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
             touch-action: none; cursor: pointer;
         }
         #lock-screen.swiped { transform: translateY(-100%); }
-        .lock-date { font-size: 19px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
-        .lock-time { font-size: 82px; font-weight: 200; letter-spacing: -2px; margin-top: -6px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
+        .lock-date { font-size: 17px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .lock-time { font-size: 78px; font-weight: 200; letter-spacing: -2px; margin-top: -4px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
         .home-indicator-bar {
-            width: 135px; height: 5px; background: #fff; border-radius: 3px;
-            margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            width: 120px; height: 4.5px; background: #fff; border-radius: 3px;
+            margin-bottom: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.5);
             animation: bounceIndicator 2s infinite;
         }
 
         @keyframes bounceIndicator {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-6px); }
+            50% { transform: translateY(-5px); }
         }
 
         /* Passcode Screen */
         #passcode-screen {
             background: rgba(0,0,0,0.75); backdrop-filter: blur(35px);
-            color: #fff; justify-content: center; align-items: center; gap: 24px; z-index: 600;
+            color: #fff; justify-content: center; align-items: center; gap: 20px; z-index: 600;
         }
-        .pass-dots { display: flex; gap: 16px; }
-        .dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #fff; }
+        .pass-dots { display: flex; gap: 14px; }
+        .dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #fff; }
         .dot.filled { background: #fff; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 20px; width: 78%; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 18px; width: 75%; }
         .key {
-            width: 72px; height: 72px; border-radius: 50%; background: rgba(255,255,255,0.22);
-            display: flex; justify-content: center; align-items: center; font-size: 28px; font-weight: 400;
+            width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.22);
+            display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: 400;
             margin: auto; cursor: pointer; transition: background 0.15s ease;
         }
         .key:active { background: rgba(255,255,255,0.45); }
@@ -119,56 +119,60 @@
         /* Home Screen */
         #home-screen {
             background-size: cover; background-position: center;
-            padding: 60px 16px 20px; justify-content: space-between;
+            padding: 55px 14px 15px; justify-content: space-between;
         }
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; }
-        .app-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 10px; }
+        .app-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
         .app-icon {
-            width: 58px; height: 58px; border-radius: 14px;
-            display: flex; justify-content: center; align-items: center; font-size: 26px;
+            width: 54px; height: 54px; border-radius: 13px;
+            display: flex; justify-content: center; align-items: center; font-size: 24px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-size: cover; background-position: center;
         }
-        .app-label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .app-label { font-size: 10px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .dock {
-            height: 84px; background: rgba(255,255,255,0.25); backdrop-filter: blur(20px);
-            border-radius: 28px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px;
+            height: 78px; background: rgba(255,255,255,0.25); backdrop-filter: blur(20px);
+            border-radius: 24px; display: flex; justify-content: space-around; align-items: center; padding: 0 8px;
         }
 
-        /* App Inside View */
+        /* App Inside View (하단 제스처바로 홈 복귀 지원) */
         .app-view {
             position: absolute; inset: 0; background: #fff; color: #000;
             z-index: 700; display: none; flex-direction: column;
         }
         .app-view.active { display: flex; }
         .app-view-header {
-            height: 48px; border-bottom: 1px solid #eee; padding: 0 16px;
+            height: 46px; border-bottom: 1px solid #eee; padding: 0 16px;
             display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px;
-            margin-top: 30px; background: #fcfcfc;
+            margin-top: 26px; background: #fcfcfc;
         }
         .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #ffffff; }
+        .app-home-bar-area {
+            height: 24px; background: #fff; display: flex; justify-content: center; align-items: center; cursor: pointer;
+        }
+        .app-home-bar { width: 110px; height: 4px; background: #000; border-radius: 2px; opacity: 0.3; }
 
         /* 🛠️ EDITOR DASHBOARD */
         .editor-dashboard {
-            width: 100%; max-width: 480px; background: #ffffff;
-            border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            width: 100%; max-width: 440px; background: #ffffff;
+            border-radius: 0 0 20px 20px; padding: 18px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
         .editor-tabs {
             display: flex; overflow-x: auto; gap: 6px;
-            margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid #f2f2f7;
+            margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #f2f2f7;
         }
         .tab-btn {
-            flex-shrink: 0; height: 38px; padding: 0 12px; border-radius: 10px; background: #f2f2f7;
-            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 600; cursor: pointer;
+            flex-shrink: 0; height: 36px; padding: 0 10px; border-radius: 9px; background: #f2f2f7;
+            display: flex; justify-content: center; align-items: center; font-size: 11px; font-weight: 600; cursor: pointer;
         }
         .tab-btn.active { background: #007aff; color: #ffffff; }
-        .panel { display: none; flex-direction: column; gap: 12px; }
+        .panel { display: none; flex-direction: column; gap: 10px; }
         .panel.active { display: flex; }
-        .panel-title { font-size: 15px; font-weight: 700; }
+        .panel-title { font-size: 14px; font-weight: 700; }
         .f-group { display: flex; flex-direction: column; gap: 4px; }
         .f-group label { font-size: 11px; font-weight: 600; color: #8e8e93; }
         .f-input {
-            width: 100%; padding: 10px; border-radius: 10px;
-            border: 1px solid #e5e5ea; background: #f9f9fb; font-size: 13px; outline: none;
+            width: 100%; padding: 9px; border-radius: 9px;
+            border: 1px solid #e5e5ea; background: #f9f9fb; font-size: 12px; outline: none;
         }
     </style>
 </head>
@@ -188,23 +192,23 @@
             <div class="status-icons">
                 <div class="signal-bars">
                     <div class="signal-bar" style="height: 3px;"></div>
-                    <div class="signal-bar" style="height: 6px;"></div>
-                    <div class="signal-bar" style="height: 9px;"></div>
-                    <div class="signal-bar" style="height: 12px;"></div>
+                    <div class="signal-bar" style="height: 5px;"></div>
+                    <div class="signal-bar" style="height: 7px;"></div>
+                    <div class="signal-bar" style="height: 10px;"></div>
                 </div>
                 <span>5G</span>
                 <div class="battery-box"><div class="battery-level"></div><div class="battery-tip"></div></div>
             </div>
         </div>
 
-        <!-- 1. Lock Screen (클릭 시 해당 에디터 연동) -->
-        <div class="screen active" id="lock-screen" onclick="syncTabTo('lock')">
+        <!-- 1. Lock Screen -->
+        <div class="screen active" id="lock-screen" onclick="switchTab('lock')">
             <div>
                 <div class="lock-date" id="lk-date">10월 24일 토요일</div>
                 <div class="lock-time" id="lk-time">09:41</div>
             </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
-                <div style="font-size: 12px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">위로 쓸어올려서 잠금해제</div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+                <div style="font-size: 11px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">위로 쓸어올려서 잠금해제</div>
                 <div class="home-indicator-bar"></div>
             </div>
         </div>
@@ -212,8 +216,8 @@
         <!-- 2. Passcode Screen -->
         <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
             <div style="text-align: center; z-index: 10;" id="passcode-inner-box">
-                <div style="font-size:15px; font-weight: 500; margin-bottom: 18px;">비밀번호 입력</div>
-                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 24px;">
+                <div style="font-size:14px; font-weight: 500; margin-bottom: 15px;">비밀번호 입력</div>
+                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 20px;">
                     <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
                 <div class="keypad">
@@ -231,8 +235,8 @@
             </div>
         </div>
 
-        <!-- 3. Home Screen (빈 곳 클릭 시 홈화면 에디터 연동) -->
-        <div class="screen" id="home-screen" onclick="syncTabTo('home')">
+        <!-- 3. Home Screen -->
+        <div class="screen" id="home-screen" onclick="switchTab('home')">
             <div class="app-grid" id="main-grid"></div>
             <div class="dock" id="dock-grid"></div>
         </div>
@@ -245,10 +249,13 @@
                 <span></span>
             </div>
             <div class="app-view-body" id="app-body"></div>
+            <div class="app-home-bar-area" onclick="returnToHomeFromApp()">
+                <div class="app-home-bar"></div>
+            </div>
         </div>
     </div>
 
-    <!-- 🛠️ EDITOR DASHBOARD (1:1 앱 개별 연동 에디터) -->
+    <!-- 🛠️ EDITOR DASHBOARD -->
     <div class="editor-dashboard">
         <div class="editor-tabs" id="editor-tabs-bar">
             <div class="tab-btn active" id="tab-btn-lock" onclick="switchTab('lock')">🔒 잠금화면</div>
@@ -267,7 +274,7 @@
         <!-- 🔒 잠금화면 편집 -->
         <div class="panel active" id="panel-lock">
             <div class="panel-title">🔒 잠금화면 편집</div>
-            <div class="f-group"><label>잠금화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'lockBg')"></div>
+            <div class="f-group"><label>잠금화면 배경 사진 (화면 맞춤)</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'lockBg')"></div>
             <div class="f-group"><label>잠금화면 날짜 표시</label><input type="text" class="f-input" id="cfg-lock-date" value="10월 24일 토요일" oninput="sync()"></div>
             <div class="f-group"><label>잠금 비밀번호 (4자리 숫자로 홈 진입)</label><input type="text" class="f-input" id="cfg-pass" value="1234" maxlength="4" oninput="sync()"></div>
         </div>
@@ -275,7 +282,7 @@
         <!-- 📱 홈화면 편집 -->
         <div class="panel" id="panel-home">
             <div class="panel-title">📱 홈화면 배경 편집</div>
-            <div class="f-group"><label>홈화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'homeBg')"></div>
+            <div class="f-group"><label>홈화면 배경 사진 (화면 맞춤)</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'homeBg')"></div>
         </div>
 
         <!-- 📝 메모 앱 편집 -->
@@ -334,7 +341,7 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v5')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v6')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
@@ -403,7 +410,7 @@
         }
     }
 
-    // 1:1 Editor Tab Switch & Sync
+    // 1:1 Editor Tab Switch & Phone View Sync
     function switchTab(panelId) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -417,13 +424,32 @@
         if (targetBtn) {
             targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
+
+        // Sync Phone Screen View
+        if (panelId === 'lock') {
+            document.getElementById('passcode-screen').classList.remove('active');
+            document.getElementById('home-screen').classList.remove('active');
+            lockScreen.classList.remove('swiped');
+            lockScreen.style.transform = 'translateY(0)';
+            lockScreen.classList.add('active');
+            closeApp();
+        } else if (panelId === 'home') {
+            document.getElementById('passcode-screen').classList.remove('active');
+            lockScreen.classList.remove('swiped');
+            lockScreen.classList.remove('active');
+            document.getElementById('home-screen').classList.add('active');
+            closeApp();
+        } else {
+            // App Tab clicked -> Open App on Phone
+            document.getElementById('passcode-screen').classList.remove('active');
+            lockScreen.classList.remove('swiped');
+            lockScreen.classList.remove('active');
+            document.getElementById('home-screen').classList.add('active');
+            openApp(panelId);
+        }
     }
 
-    function syncTabTo(panelId) {
-        switchTab(panelId);
-    }
-
-    // File Uploads (Base64)
+    // File Uploads (Aspect Ratio Fit)
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -453,13 +479,19 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('ios_world_db_v5', JSON.stringify(db));
+        localStorage.setItem('ios_world_db_v6', JSON.stringify(db));
         renderPhone();
     }
 
     function renderPhone() {
         document.getElementById('lock-screen').style.backgroundImage = `url('${db.lockBg}')`;
+        document.getElementById('lock-screen').style.backgroundSize = 'cover';
+        document.getElementById('lock-screen').style.backgroundPosition = 'center';
+
         document.getElementById('home-screen').style.backgroundImage = `url('${db.homeBg}')`;
+        document.getElementById('home-screen').style.backgroundSize = 'cover';
+        document.getElementById('home-screen').style.backgroundPosition = 'center';
+
         document.getElementById('lk-date').innerText = db.lockDate;
 
         const mainApps = [
@@ -471,10 +503,10 @@
         ];
 
         const dockApps = [
-            { id: 'phone', name: '전화', icon: db.icons.phone },
-            { id: 'kakao', name: '카카오톡', icon: db.icons.kakao },
-            { id: 'music', name: '음악', icon: db.icons.music },
-            { id: 'safari', name: '인터넷', icon: db.icons.safari }
+            { id: 'phone', name: '전화', icon: db.icons.phone, hideLabel: true },
+            { id: 'kakao', name: '카카오톡', icon: db.icons.kakao, hideLabel: true },
+            { id: 'music', name: '음악', icon: db.icons.music, hideLabel: true },
+            { id: 'safari', name: '인터넷', icon: db.icons.safari, hideLabel: true }
         ];
 
         const mGrid = document.getElementById('main-grid');
@@ -490,14 +522,15 @@
         item.className = 'app-item';
         item.onclick = (e) => {
             e.stopPropagation();
-            syncTabTo(app.id);
+            switchTab(app.id);
             openApp(app.id);
         };
-        const isImg = app.icon.startsWith('http') || app.icon.startsWith('data:image');
-        const bgStyle = isImg ? `background-image: url('${app.icon}'); background-size: cover;` : 'background: rgba(255,255,255,0.3); backdrop-filter:blur(10px);';
+        const isImg = typeof app.icon === 'string' && (app.icon.startsWith('http') || app.icon.startsWith('data:image'));
+        const bgStyle = isImg ? `background-image: url('${app.icon}'); background-size: cover; background-position: center;` : 'background: rgba(255,255,255,0.3); backdrop-filter:blur(10px);';
         const txt = isImg ? '' : app.icon;
 
-        item.innerHTML = `<div class="app-icon" style="${bgStyle}">${txt}</div><div class="app-label">${app.name}</div>`;
+        const labelHtml = app.hideLabel ? '' : `<div class="app-label">${app.name}</div>`;
+        item.innerHTML = `<div class="app-icon" style="${bgStyle}">${txt}</div>${labelHtml}`;
         return item;
     }
 
@@ -540,6 +573,11 @@
 
     function closeApp() {
         document.getElementById('app-view').classList.remove('active');
+    }
+
+    function returnToHomeFromApp() {
+        closeApp();
+        switchTab('home');
     }
 
     // Init Inputs

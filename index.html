@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Custom iOS Simulator</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; user-select: none; }
+    body { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; color: white; overflow: hidden; }
+
+    /* 아이폰 프레임 */
+    .iphone {
+      width: 360px; height: 740px; background-size: cover; background-position: center;
+      border-radius: 48px; border: 10px solid #2c2c2e; box-shadow: 0 0 50px rgba(255,255,255,0.1);
+      position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 45px 20px 20px;
+      overflow: hidden; transition: background-image 0.3s ease;
+    }
+
+    /* 노치 및 상단바 */
+    .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 28px; background: #000; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 10; }
+    .status-bar { position: absolute; top: 10px; left: 25px; right: 25px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; z-index: 9; }
+
+    /* 앱 그리드 */
+    .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 12px; margin-top: 15px; }
+    .app { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; cursor: pointer; }
+    .app-icon {
+      width: 60px; height: 60px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px);
+      border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.2s;
+    }
+    .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 65px; }
+
+    /* 편집 모드 (흔들림 효과) */
+    .editing .app-icon { animation: jiggle 0.25s infinite alternate; }
+    @keyframes jiggle { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+    .delete-btn { position: absolute; top: -5px; left: 2px; background: #ff3b30; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; }
+    .editing .delete-btn { display: flex; }
+
+    /* 하단 독 */
+    .dock { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(25px); border-radius: 30px; padding: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    /* 앱 실행 창 (모달) */
+    .app-window {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e;
+      z-index: 20; display: none; flex-direction: column; padding: 50px 20px 20px; border-radius: 40px;
+      animation: openApp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes openApp { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
+    .app-title { font-size: 20px; font-weight: bold; }
+    .close-btn { background: #333; color: #0a84ff; border: none; padding: 6px 12px; border-radius: 15px; font-weight: 600; cursor: pointer; }
+    .app-content { flex: 1; overflow-y: auto; font-size: 15px; line-height: 1.5; color: #ddd; white-space: pre-wrap; }
+
+    /* 모달 창 / 입력 폼 */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 30; display: none; align-items: center; justify-content: center; }
+    .modal-box { background: #2c2c2e; padding: 20px; border-radius: 20px; width: 300px; display: flex; flex-direction: column; gap: 10px; }
+    .modal-box input, .modal-box textarea { background: #1c1c1e; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; font-size: 14px; }
+    .modal-box button { background: #0a84ff; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+    /* 제어 컨트롤 */
+    .controls { margin-top: 15px; display: flex; gap: 10px; }
+    .btn { background: rgba(255,255,255,0.15); color: white; padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- 아이폰 시뮬레이터 -->
+  <div class="iphone" id="iphone">
+    <div class="notch"></div>
+    <div class="status-bar"><span id="clock">09:41</span><span>5G 🔋</span></div>
+
+    <!-- 홈화면 앱 그리드 -->
+    <div class="app-grid" id="appGrid"></div>
+
+    <!-- 하단 독 -->
+    <div class="dock" id="dockGrid"></div>
+
+    <!-- 앱 실행 화면 -->
+    <div class="app-window" id="appWindow">
+      <div class="app-header">
+        <span class="app-title" id="windowTitle">앱 제목</span>
+        <button class="close-btn" onclick="closeApp()">닫기</button>
+      </div>
+      <div class="app-content" id="windowContent">앱 내용이 여기에 표시됩니다.</div>
+    </div>
+  </div>
+
+  <!-- 설정 버튼들 -->
+  <div class="controls">
+    <button class="btn" onclick="openAddModal()">➕ 앱 생성</button>
+    <label class="btn" for="bgUpload">🖼️ 배경 변경</label>
+    <input type="file" id="bgUpload" accept="image/*">
+    <button class="btn" onclick="toggleEdit()">✏️ 편집 모드</button>
+  </div>
+
+  <!-- 앱 생성 모달 -->
+  <div class="modal" id="addModal">
+    <div class="modal-box">
+      <h3>새 커스텀 앱 만들기</h3>
+      <input type="text" id="newAppName" placeholder="앱 이름 (예: 내 일기장)">
+      <input type="text" id="newAppIcon" placeholder="이모지 아이콘 (예: 📖)">
+      <textarea id="newAppContent" rows="4" placeholder="앱 실행 시 보여줄 내용을 입력하세요! (글귀, 메모 등)"></textarea>
+      <button onclick="saveNewApp()">저장하기</button>
+      <button onclick="closeAddModal()" style="background:#ff3b30;">취소</button>
+    </div>
+  </div>
+
+  <script>
+    // 기본 기본 저장된 앱 데이터
+    const defaultApps = [
+      { id: 1, name: "메모장", icon: "📝", content: "여기에 원하는 메모나 글을 작성해둘 수 있어!" },
+      { id: 2, name: "음악", icon: "🎵", content: "🎶 오늘 추천 플레이리스트:\n1. NewJeans - Hype Boy\n2. IU - 밤편지" },
+      { id: 3, name: "사진첩", icon: "🖼️", content: "소중한 추억들이 보관되는 곳이야 ✨" },
+      { id: 4, name: "설정", icon: "⚙️", content: "iOS 버전에 오신 것을 환영합니다.\n버전: iOS 18 Custom" }
+    ];
+
+    let apps = JSON.parse(localStorage.getItem('my_ios_apps')) || defaultApps;
+    let bgImage = localStorage.getItem('my_ios_bg') || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600';
+    let isEditing = false;
+
+    // 초기화
+    function init() {
+      document.getElementById('iphone').style.backgroundImage = `url('${bgImage}')`;
+      renderApps();
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    // 시계 업데이트
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('clock').innerText = `${hours}:${minutes}`;
+    }
+
+    // 앱 목록 그리드에 렌더링
+    function renderApps() {
+      const grid = document.getElementById('appGrid');
+      grid.innerHTML = '';
+      apps.forEach((app, index) => {
+        const appEl = document.createElement('div');
+        appEl.className = 'app';
+        appEl.innerHTML = `
+          <div class="delete-btn" onclick="deleteApp(event, ${index})">✕</div>
+          <div class="app-icon" onclick="openApp(${index})">${app.icon}</div>
+          <span class="app-name">${app.name}</span>
+        `;
+        grid.appendChild(appEl);
+      });
+    }
+
+    // 앱 실행 창 열기
+    function openApp(index) {
+      if (isEditing) return;
+      const app = apps[index];
+      document.getElementById('windowTitle').innerText = `${app.icon} ${app.name}`;
+      document.getElementById('windowContent').innerText = app.content;
+      document.getElementById('appWindow').style.display = 'flex';
+    }
+
+    // 앱 창 닫기
+    function closeApp() {
+      document.getElementById('appWindow').style.display = 'none';
+    }
+
+    // 배경화면 업로드
+    document.getElementById('bgUpload').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          bgImage = event.target.result;
+          document.getElementById('iphone').style.backgroundImage = `url('${bgImage}')`;
+          localStorage.setItem('my_ios_bg', bgImage);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // 편집 모드 토글 (앱 흔들림 및 삭제 활성화)
+    function toggleEdit() {
+      isEditing = !isEditing;
+      const iphone = document.getElementById('iphone');
+      if (isEditing) iphone.classList.add('editing');
+      else iphone.classList.remove('editing');
+    }
+
+    // 앱 삭제
+    function deleteApp(e, index) {
+      e.stopPropagation();
+      apps.splice(index, 1);
+      saveApps();
+      renderApps();
+    }
+
+    // 새 앱 모달 제어
+    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
+    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
+
+    // 새 앱 저장
+    function saveNewApp() {
+      const name = document.getElementById('newAppName').value.trim();
+      const icon = document.getElementById('newAppIcon').value.trim() || '📱';
+      const content = document.getElementById('newAppContent').value.trim();
+
+      if (!name) { alert('앱 이름을 입력해주세요!'); return; }
+
+      apps.push({ id: Date.now(), name, icon, content: content || '내용이 없습니다.' });
+      saveApps();
+      renderApps();
+      closeAddModal();
+
+      // 입력란 초기화
+      document.getElementById('newAppName').value = '';
+      document.getElementById('newAppIcon').value = '';
+      document.getElementById('newAppContent').value = '';
+    }
+
+    // 데이터 저장
+    function saveApps() {
+      localStorage.setItem('my_ios_apps', JSON.stringify(apps));
+    }
+
+    init();
+  </script>
+</body>
+</html>

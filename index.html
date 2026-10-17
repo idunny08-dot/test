@@ -1,229 +1,574 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Custom iOS Simulator</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; user-select: none; }
-    body { background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; color: white; overflow: hidden; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iOS Custom Phone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-    /* 아이폰 프레임 */
-    .iphone {
-      width: 360px; height: 740px; background-size: cover; background-position: center;
-      border-radius: 48px; border: 10px solid #2c2c2e; box-shadow: 0 0 50px rgba(255,255,255,0.1);
-      position: relative; display: flex; flex-direction: column; justify-content: space-between; padding: 45px 20px 20px;
-      overflow: hidden; transition: background-image 0.3s ease;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    /* 노치 및 상단바 */
-    .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 140px; height: 28px; background: #000; border-bottom-left-radius: 18px; border-bottom-right-radius: 18px; z-index: 10; }
-    .status-bar { position: absolute; top: 10px; left: 25px; right: 25px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; z-index: 9; }
+        /* Phone Screen Frame */
+        #phone {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.3s ease;
+        }
 
-    /* 앱 그리드 */
-    .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 12px; margin-top: 15px; }
-    .app { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; cursor: pointer; }
-    .app-icon {
-      width: 60px; height: 60px; background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(15px);
-      border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 28px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3); transition: transform 0.2s;
-    }
-    .app-name { font-size: 11px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 65px; }
+        /* Status Bar */
+        .status-bar {
+            height: 44px;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
 
-    /* 편집 모드 (흔들림 효과) */
-    .editing .app-icon { animation: jiggle 0.25s infinite alternate; }
-    @keyframes jiggle { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
-    .delete-btn { position: absolute; top: -5px; left: 2px; background: #ff3b30; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: none; align-items: center; justify-content: center; font-weight: bold; }
-    .editing .delete-btn { display: flex; }
+        /* Lock Screen */
+        #lock-screen {
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 60px 20px 40px;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    /* 하단 독 */
-    .dock { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(25px); border-radius: 30px; padding: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        #lock-screen.unlocked {
+            transform: translateY(-100%);
+        }
 
-    /* 앱 실행 창 (모달) */
-    .app-window {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1c1c1e;
-      z-index: 20; display: none; flex-direction: column; padding: 50px 20px 20px; border-radius: 40px;
-      animation: openApp 0.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
-    }
-    @keyframes openApp { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .app-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 15px; }
-    .app-title { font-size: 20px; font-weight: bold; }
-    .close-btn { background: #333; color: #0a84ff; border: none; padding: 6px 12px; border-radius: 15px; font-weight: 600; cursor: pointer; }
-    .app-content { flex: 1; overflow-y: auto; font-size: 15px; line-height: 1.5; color: #ddd; white-space: pre-wrap; }
+        .lock-clock {
+            text-align: center;
+        }
+        .lock-date {
+            font-size: 18px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        .lock-time {
+            font-size: 76px;
+            font-weight: 200;
+            letter-spacing: -2px;
+            margin-top: -5px;
+        }
 
-    /* 모달 창 / 입력 폼 */
-    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 30; display: none; align-items: center; justify-content: center; }
-    .modal-box { background: #2c2c2e; padding: 20px; border-radius: 20px; width: 300px; display: flex; flex-direction: column; gap: 10px; }
-    .modal-box input, .modal-box textarea { background: #1c1c1e; border: 1px solid #444; color: white; padding: 10px; border-radius: 8px; font-size: 14px; }
-    .modal-box button { background: #0a84ff; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .unlock-hint {
+            font-size: 14px;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+        }
 
-    /* 제어 컨트롤 */
-    .controls { margin-top: 15px; display: flex; gap: 10px; }
-    .btn { background: rgba(255,255,255,0.15); color: white; padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 600; cursor: pointer; }
-    input[type="file"] { display: none; }
-  </style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.9; }
+        }
+
+        /* Home Screen */
+        #home-screen {
+            position: absolute;
+            inset: 0;
+            padding: 60px 20px 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px 15px;
+            width: 100%;
+        }
+
+        .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .app-icon {
+            width: 62px;
+            height: 62px;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .app-name {
+            font-size: 11px;
+            margin-top: 6px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+            text-align: center;
+            width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Jiggle Mode (흔들림) */
+        .jiggling .app-icon {
+            animation: jiggle 0.25s infinite alternate ease-in-out;
+        }
+        .jiggling:nth-child(even) .app-icon {
+            animation-delay: 0.08s;
+        }
+
+        @keyframes jiggle {
+            0% { transform: rotate(-2.5deg); }
+            100% { transform: rotate(2.5deg); }
+        }
+
+        .delete-btn {
+            display: none;
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            width: 22px;
+            height: 22px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+        .jiggling .delete-btn {
+            display: flex;
+        }
+
+        /* Dock */
+        .dock {
+            height: 90px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 10px;
+            margin-bottom: 10px;
+        }
+
+        /* App Inside View (Modal) */
+        .app-view {
+            position: absolute;
+            inset: 0;
+            background: #1c1c1e;
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            animation: openApp 0.3s cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        .app-view.active {
+            display: flex;
+        }
+
+        @keyframes openApp {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .app-header {
+            height: 60px;
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-top: 30px;
+        }
+
+        .app-header h2 { font-size: 18px; }
+        .close-btn { color: #0a84ff; font-size: 16px; cursor: pointer; background: none; border: none; }
+
+        .app-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        /* Custom Editor Modal */
+        .modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+
+        .modal-card {
+            background: #2c2c2e;
+            width: 100%;
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-card input {
+            background: #1c1c1e;
+            border: 1px solid #3a3a3c;
+            color: white;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-primary { background: #0a84ff; color: white; }
+        .btn-secondary { background: #3a3a3c; color: white; }
+
+        /* Editing controls */
+        .top-tools {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .tool-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- 아이폰 시뮬레이터 -->
-  <div class="iphone" id="iphone">
-    <div class="notch"></div>
-    <div class="status-bar"><span id="clock">09:41</span><span>5G 🔋</span></div>
-
-    <!-- 홈화면 앱 그리드 -->
-    <div class="app-grid" id="appGrid"></div>
-
-    <!-- 하단 독 -->
-    <div class="dock" id="dockGrid"></div>
-
-    <!-- 앱 실행 화면 -->
-    <div class="app-window" id="appWindow">
-      <div class="app-header">
-        <span class="app-title" id="windowTitle">앱 제목</span>
-        <button class="close-btn" onclick="closeApp()">닫기</button>
-      </div>
-      <div class="app-content" id="windowContent">앱 내용이 여기에 표시됩니다.</div>
+<div id="phone">
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <span id="status-time">9:41</span>
+        <span>􀛨 5G 🔋</span>
     </div>
-  </div>
 
-  <!-- 설정 버튼들 -->
-  <div class="controls">
-    <button class="btn" onclick="openAddModal()">➕ 앱 생성</button>
-    <label class="btn" for="bgUpload">🖼️ 배경 변경</label>
-    <input type="file" id="bgUpload" accept="image/*">
-    <button class="btn" onclick="toggleEdit()">✏️ 편집 모드</button>
-  </div>
-
-  <!-- 앱 생성 모달 -->
-  <div class="modal" id="addModal">
-    <div class="modal-box">
-      <h3>새 커스텀 앱 만들기</h3>
-      <input type="text" id="newAppName" placeholder="앱 이름 (예: 내 일기장)">
-      <input type="text" id="newAppIcon" placeholder="이모지 아이콘 (예: 📖)">
-      <textarea id="newAppContent" rows="4" placeholder="앱 실행 시 보여줄 내용을 입력하세요! (글귀, 메모 등)"></textarea>
-      <button onclick="saveNewApp()">저장하기</button>
-      <button onclick="closeAddModal()" style="background:#ff3b30;">취소</button>
+    <!-- Lock Screen -->
+    <div id="lock-screen">
+        <div class="lock-clock">
+            <div class="lock-date" id="lock-date">10월 24일 목요일</div>
+            <div class="lock-time" id="lock-time">09:41</div>
+        </div>
+        <div class="unlock-hint">터치하여 잠금 해제</div>
     </div>
-  </div>
 
-  <script>
-    // 기본 기본 저장된 앱 데이터
-    const defaultApps = [
-      { id: 1, name: "메모장", icon: "📝", content: "여기에 원하는 메모나 글을 작성해둘 수 있어!" },
-      { id: 2, name: "음악", icon: "🎵", content: "🎶 오늘 추천 플레이리스트:\n1. NewJeans - Hype Boy\n2. IU - 밤편지" },
-      { id: 3, name: "사진첩", icon: "🖼️", content: "소중한 추억들이 보관되는 곳이야 ✨" },
-      { id: 4, name: "설정", icon: "⚙️", content: "iOS 버전에 오신 것을 환영합니다.\n버전: iOS 18 Custom" }
-    ];
+    <!-- Home Screen -->
+    <div id="home-screen">
+        <div>
+            <div class="top-tools">
+                <button class="tool-btn" onclick="openBgModal()">배경 커스텀</button>
+                <button class="tool-btn" onclick="openAppModal()">+ 앱 추가</button>
+                <button class="tool-btn" id="done-jiggle" style="display:none;" onclick="stopJiggle()">완료</button>
+            </div>
+            
+            <div class="app-grid" id="app-grid">
+                <!-- App icons rendered dynamically -->
+            </div>
+        </div>
 
-    let apps = JSON.parse(localStorage.getItem('my_ios_apps')) || defaultApps;
-    let bgImage = localStorage.getItem('my_ios_bg') || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600';
-    let isEditing = false;
+        <!-- Dock -->
+        <div class="dock" id="dock-grid">
+            <!-- Dock items -->
+        </div>
+    </div>
 
-    // 초기화
-    function init() {
-      document.getElementById('iphone').style.backgroundImage = `url('${bgImage}')`;
-      renderApps();
-      updateClock();
-      setInterval(updateClock, 1000);
+    <!-- App Inside View (Modal App) -->
+    <div class="app-view" id="app-view">
+        <div class="app-header">
+            <button class="close-btn" onclick="closeApp()">닫기</button>
+            <h2 id="app-view-title">앱 이름</h2>
+            <button class="close-btn" onclick="saveAppInnerContent()">저장</button>
+        </div>
+        <div class="app-content">
+            <p style="margin-bottom: 10px; opacity: 0.7;">이 앱의 내부 커스텀 내용:</p>
+            <textarea id="app-inner-text" style="width: 100%; height: 200px; background: #2c2c2e; color: white; border: 1px solid #3a3a3c; border-radius: 10px; padding: 12px;" placeholder="여기에 앱 내부 디테일 메모나 텍스트를 적어보세요..."></textarea>
+            <div id="app-external-link-container" style="margin-top: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- Custom Modal (Add/Edit App) -->
+    <div class="modal" id="app-modal">
+        <div class="modal-card">
+            <h3>앱 추가 / 수정</h3>
+            <input type="text" id="modal-app-name" placeholder="앱 이름">
+            <input type="text" id="modal-app-icon" placeholder="이모지(예: 📱) 또는 이미지 URL">
+            <input type="text" id="modal-app-url" placeholder="외부 링크 URL (선택사항)">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal('app-modal')">취소</button>
+                <button class="btn btn-primary" onclick="saveApp()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal (Background) -->
+    <div class="modal" id="bg-modal">
+        <div class="modal-card">
+            <h3>배경화면 커스텀</h3>
+            <input type="text" id="modal-lock-bg" placeholder="잠금화면 이미지 URL">
+            <input type="text" id="modal-home-bg" placeholder="홈화면 이미지 URL">
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal('bg-modal')">취소</button>
+                <button class="btn btn-primary" onclick="saveBackgrounds()">적용</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initial State & LocalStorage Load
+    let config = JSON.parse(localStorage.getItem('ios_phone_config')) || {
+        lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
+        homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
+        apps: [
+            { id: 1, name: '카카오톡', icon: '💬', url: '', content: '카톡 스타일 비밀 메모장!' },
+            { id: 2, name: '유튜브', icon: '▶️', url: 'https://youtube.com', content: '' },
+            { id: 3, name: '인스타그램', icon: '📸', url: 'https://instagram.com', content: '' },
+            { id: 4, name: '설정/다이어리', icon: '📝', url: '', content: '나만의 디테일 다이어리 폰꾸미기' }
+        ],
+        dock: [
+            { id: 101, name: '전화', icon: '📞', url: '' },
+            { id: 102, name: '사파리', icon: '🌐', url: 'https://google.com' }
+        ]
+    };
+
+    let isJiggling = false;
+    let currentOpenedAppId = null;
+
+    function saveConfig() {
+        localStorage.setItem('ios_phone_config', JSON.stringify(config));
     }
 
-    // 시계 업데이트
-    function updateClock() {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById('clock').innerText = `${hours}:${minutes}`;
+    // Render Function
+    function render() {
+        // Set backgrounds
+        document.getElementById('lock-screen').style.backgroundImage = `url('${config.lockBg}')`;
+        document.getElementById('phone').style.backgroundImage = `url('${config.homeBg}')`;
+
+        // Render Apps
+        const grid = document.getElementById('app-grid');
+        grid.innerHTML = '';
+        config.apps.forEach(app => {
+            grid.appendChild(createAppElem(app));
+        });
+
+        // Render Dock
+        const dock = document.getElementById('dock-grid');
+        dock.innerHTML = '';
+        config.dock.forEach(app => {
+            dock.appendChild(createAppElem(app, true));
+        });
     }
 
-    // 앱 목록 그리드에 렌더링
-    function renderApps() {
-      const grid = document.getElementById('appGrid');
-      grid.innerHTML = '';
-      apps.forEach((app, index) => {
-        const appEl = document.createElement('div');
-        appEl.className = 'app';
-        appEl.innerHTML = `
-          <div class="delete-btn" onclick="deleteApp(event, ${index})">✕</div>
-          <div class="app-icon" onclick="openApp(${index})">${app.icon}</div>
-          <span class="app-name">${app.name}</span>
+    function createAppElem(app, isDock = false) {
+        const item = document.createElement('div');
+        item.className = 'app-item' + (isJiggling ? ' jiggling' : '');
+        
+        const isImg = app.icon.startsWith('http');
+        const iconStyle = isImg ? `background-image: url('${app.icon}');` : '';
+        const iconContent = isImg ? '' : app.icon;
+
+        item.innerHTML = `
+            <div class="delete-btn" onclick="deleteApp(event, ${app.id}, ${isDock})">×</div>
+            <div class="app-icon" style="${iconStyle}">${iconContent}</div>
+            ${!isDock ? `<div class="app-name">${app.name}</div>` : ''}
         `;
-        grid.appendChild(appEl);
-      });
-    }
 
-    // 앱 실행 창 열기
-    function openApp(index) {
-      if (isEditing) return;
-      const app = apps[index];
-      document.getElementById('windowTitle').innerText = `${app.icon} ${app.name}`;
-      document.getElementById('windowContent').innerText = app.content;
-      document.getElementById('appWindow').style.display = 'flex';
-    }
+        // Long press for Jiggle Mode
+        let timer;
+        item.addEventListener('touchstart', () => timer = setTimeout(startJiggle, 600));
+        item.addEventListener('touchend', () => clearTimeout(timer));
+        item.addEventListener('mousedown', () => timer = setTimeout(startJiggle, 600));
+        item.addEventListener('mouseup', () => clearTimeout(timer));
 
-    // 앱 창 닫기
-    function closeApp() {
-      document.getElementById('appWindow').style.display = 'none';
-    }
-
-    // 배경화면 업로드
-    document.getElementById('bgUpload').addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          bgImage = event.target.result;
-          document.getElementById('iphone').style.backgroundImage = `url('${bgImage}')`;
-          localStorage.setItem('my_ios_bg', bgImage);
+        item.onclick = (e) => {
+            if (isJiggling) return;
+            openApp(app);
         };
-        reader.readAsDataURL(file);
-      }
-    });
 
-    // 편집 모드 토글 (앱 흔들림 및 삭제 활성화)
-    function toggleEdit() {
-      isEditing = !isEditing;
-      const iphone = document.getElementById('iphone');
-      if (isEditing) iphone.classList.add('editing');
-      else iphone.classList.remove('editing');
+        return item;
     }
 
-    // 앱 삭제
-    function deleteApp(e, index) {
-      e.stopPropagation();
-      apps.splice(index, 1);
-      saveApps();
-      renderApps();
+    // Lockscreen Unlock
+    document.getElementById('lock-screen').onclick = function() {
+        this.classList.add('unlocked');
+    };
+
+    // Clock Logic
+    function updateClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+
+        document.getElementById('status-time').innerText = timeStr;
+        document.getElementById('lock-time').innerText = timeStr;
+
+        const options = { month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('lock-date').innerText = now.toLocaleDateString('ko-KR', options);
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // Jiggle Mode Controls
+    function startJiggle() {
+        isJiggling = true;
+        document.getElementById('done-jiggle').style.display = 'inline-block';
+        render();
+    }
+    function stopJiggle() {
+        isJiggling = false;
+        document.getElementById('done-jiggle').style.display = 'none';
+        render();
     }
 
-    // 새 앱 모달 제어
-    function openAddModal() { document.getElementById('addModal').style.display = 'flex'; }
-    function closeAddModal() { document.getElementById('addModal').style.display = 'none'; }
-
-    // 새 앱 저장
-    function saveNewApp() {
-      const name = document.getElementById('newAppName').value.trim();
-      const icon = document.getElementById('newAppIcon').value.trim() || '📱';
-      const content = document.getElementById('newAppContent').value.trim();
-
-      if (!name) { alert('앱 이름을 입력해주세요!'); return; }
-
-      apps.push({ id: Date.now(), name, icon, content: content || '내용이 없습니다.' });
-      saveApps();
-      renderApps();
-      closeAddModal();
-
-      // 입력란 초기화
-      document.getElementById('newAppName').value = '';
-      document.getElementById('newAppIcon').value = '';
-      document.getElementById('newAppContent').value = '';
+    function deleteApp(e, id, isDock) {
+        e.stopPropagation();
+        if (isDock) {
+            config.dock = config.dock.filter(a => a.id !== id);
+        } else {
+            config.apps = config.apps.filter(a => a.id !== id);
+        }
+        saveConfig();
+        render();
     }
 
-    // 데이터 저장
-    function saveApps() {
-      localStorage.setItem('my_ios_apps', JSON.stringify(apps));
+    // App Open & Inside View Logic
+    function openApp(app) {
+        if (app.url) {
+            window.open(app.url, '_blank');
+            return;
+        }
+        currentOpenedAppId = app.id;
+        document.getElementById('app-view-title').innerText = app.name;
+        document.getElementById('app-inner-text').value = app.content || '';
+        document.getElementById('app-view').classList.add('active');
     }
 
-    init();
-  </script>
+    function closeApp() {
+        document.getElementById('app-view').classList.remove('active');
+    }
+
+    function saveAppInnerContent() {
+        const text = document.getElementById('app-inner-text').value;
+        const app = config.apps.find(a => a.id === currentOpenedAppId) || config.dock.find(a => a.id === currentOpenedAppId);
+        if (app) {
+            app.content = text;
+            saveConfig();
+            alert('앱 내부 내용이 저장되었습니다!');
+        }
+        closeApp();
+    }
+
+    // Modal Control
+    function openAppModal() {
+        document.getElementById('app-modal').classList.add('active');
+    }
+    function openBgModal() {
+        document.getElementById('modal-lock-bg').value = config.lockBg;
+        document.getElementById('modal-home-bg').value = config.homeBg;
+        document.getElementById('bg-modal').classList.add('active');
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function saveApp() {
+        const name = document.getElementById('modal-app-name').value || '새 앱';
+        const icon = document.getElementById('modal-app-icon').value || '📱';
+        const url = document.getElementById('modal-app-url').value;
+
+        config.apps.push({
+            id: Date.now(),
+            name: name,
+            icon: icon,
+            url: url,
+            content: ''
+        });
+
+        saveConfig();
+        render();
+        closeModal('app-modal');
+    }
+
+    function saveBackgrounds() {
+        config.lockBg = document.getElementById('modal-lock-bg').value || config.lockBg;
+        config.homeBg = document.getElementById('modal-home-bg').value || config.homeBg;
+        saveConfig();
+        render();
+        closeModal('bg-modal');
+    }
+
+    // Initial Launch
+    render();
+</script>
 </body>
 </html>

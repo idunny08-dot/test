@@ -43,22 +43,21 @@
             box-shadow: 0 16px 40px rgba(0,0,0,0.2);
         }
 
-        /* iOS Real Status Bar */
+        /* iOS Real Status Bar (통일되고 커진 폰트 & 배터리) */
         .status-bar {
             position: absolute; top: 0; width: 100%; height: 44px;
-            padding: 0 20px; display: flex; justify-content: space-between; align-items: center;
-            font-size: 13px; font-weight: 600; color: #fff; z-index: 500;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+            padding: 0 22px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; font-weight: 600; color: #fff; z-index: 500;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
         }
-        .status-icons { display: flex; align-items: center; gap: 5px; font-size: 12px; }
-        /* Battery Icon Style */
+        .status-icons { display: flex; align-items: center; gap: 6px; font-size: 13px; }
         .battery-box {
-            width: 22px; height: 11px; border: 1px solid #fff; border-radius: 3px;
+            width: 25px; height: 13px; border: 1.5px solid #fff; border-radius: 3.5px;
             padding: 1px; display: flex; align-items: center; position: relative;
         }
         .battery-level { width: 100%; height: 100%; background: #fff; border-radius: 1px; }
         .battery-tip {
-            position: absolute; right: -3px; top: 3px; width: 1.5px; height: 4px;
+            position: absolute; right: -3.5px; top: 3.5px; width: 2px; height: 4px;
             background: #fff; border-radius: 0 1px 1px 0;
         }
 
@@ -92,13 +91,13 @@
         /* Home Screen */
         #home-screen {
             background-size: cover; background-position: center;
-            padding: 60px 16px 20px; justify-content: space-between;
+            padding: 55px 16px 20px; justify-content: space-between;
         }
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 12px; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 12px; }
         .app-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
         .app-icon {
-            width: 58px; height: 58px; border-radius: 14px;
-            display: flex; justify-content: center; align-items: center; font-size: 28px;
+            width: 56px; height: 56px; border-radius: 14px;
+            display: flex; justify-content: center; align-items: center; font-size: 26px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15); background-size: cover; background-position: center;
         }
         .app-label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
@@ -120,18 +119,18 @@
         }
         .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #f2f2f7; }
 
-        /* 🛠️ EDITOR DASHBOARD (하단 제어판) */
+        /* 🛠️ EDITOR DASHBOARD (완전 분리된 제어판) */
         .editor-dashboard {
             width: 100%; max-width: 480px; background: #ffffff;
             border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
         .editor-tabs {
-            display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;
+            display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
             margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f2f2f7;
         }
         .tab-btn {
-            height: 44px; border-radius: 12px; background: #f2f2f7;
-            display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer;
+            height: 40px; border-radius: 10px; background: #f2f2f7;
+            display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer;
         }
         .tab-btn.active { background: #e8f0fe; color: #007aff; }
         .panel { display: none; flex-direction: column; gap: 12px; }
@@ -171,23 +170,25 @@
             <div style="font-size: 12px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">화면을 터치하여 잠금해제</div>
         </div>
 
-        <!-- 2. Passcode Screen -->
-        <div class="screen" id="passcode-screen">
-            <div style="font-size:14px;">비밀번호 입력</div>
-            <div class="pass-dots" id="p-dots">
-                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
-            </div>
-            <div class="keypad">
-                <div class="key" onclick="pressKey('1')">1</div>
-                <div class="key" onclick="pressKey('2')">2</div>
-                <div class="key" onclick="pressKey('3')">3</div>
-                <div class="key" onclick="pressKey('4')">4</div>
-                <div class="key" onclick="pressKey('5')">5</div>
-                <div class="key" onclick="pressKey('6')">6</div>
-                <div class="key" onclick="pressKey('7')">7</div>
-                <div class="key" onclick="pressKey('8')">8</div>
-                <div class="key" onclick="pressKey('9')">9</div>
-                <div class="key" style="grid-column: 2;" onclick="pressKey('0')">0</div>
+        <!-- 2. Passcode Screen (빈 공간 터치 시 잠금화면으로 복귀) -->
+        <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
+            <div style="text-align: center; z-index: 10;" id="passcode-inner-box">
+                <div style="font-size:14px; margin-bottom: 15px;">비밀번호 입력</div>
+                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 20px;">
+                    <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                </div>
+                <div class="keypad">
+                    <div class="key" onclick="pressKey('1')">1</div>
+                    <div class="key" onclick="pressKey('2')">2</div>
+                    <div class="key" onclick="pressKey('3')">3</div>
+                    <div class="key" onclick="pressKey('4')">4</div>
+                    <div class="key" onclick="pressKey('5')">5</div>
+                    <div class="key" onclick="pressKey('6')">6</div>
+                    <div class="key" onclick="pressKey('7')">7</div>
+                    <div class="key" onclick="pressKey('8')">8</div>
+                    <div class="key" onclick="pressKey('9')">9</div>
+                    <div class="key" style="grid-column: 2;" onclick="pressKey('0')">0</div>
+                </div>
             </div>
         </div>
 
@@ -208,81 +209,101 @@
         </div>
     </div>
 
-    <!-- 🛠️ EDITOR DASHBOARD (완전 분리된 제어판) -->
+    <!-- 🛠️ EDITOR DASHBOARD (앱별 완벽 개별 분류 제어판) -->
     <div class="editor-dashboard">
         <div class="editor-tabs">
-            <div class="tab-btn active" onclick="switchTab(0, 'p-lock')">🔒</div>
-            <div class="tab-btn" onclick="switchTab(1, 'p-home')">📱</div>
-            <div class="tab-btn" onclick="switchTab(2, 'p-apps')">💬</div>
-            <div class="tab-btn" onclick="switchTab(3, 'p-notes')">📝</div>
-            <div class="tab-btn" onclick="switchTab(4, 'p-cal')">📅</div>
+            <div class="tab-btn active" onclick="switchTab(0, 'lock')">🔒</div>
+            <div class="tab-btn" onclick="switchTab(1, 'home')">📱</div>
+            <div class="tab-btn" onclick="switchTab(2, 'memo')">📝</div>
+            <div class="tab-btn" onclick="switchTab(3, 'gallery')">🖼️</div>
+            <div class="tab-btn" onclick="switchTab(4, 'kakao')">💬</div>
+            <div class="tab-btn" onclick="switchTab(5, 'more')">✨</div>
         </div>
 
-        <!-- Tab 0: Lock Screen Settings -->
-        <div class="panel active" id="panel-p-lock">
+        <!-- Tab 0: Lock Screen -->
+        <div class="panel active" id="panel-lock">
             <div class="panel-title">🔒 잠금 화면 설정</div>
             <div class="f-group"><label>잠금 화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'lockBg')"></div>
-            <div class="f-group"><label>잠금 화면 시간 표시 (예: 09:41 또는 오후 5:16)</label><input type="text" class="f-input" id="cfg-lock-time" value="09:41" oninput="sync()"></div>
             <div class="f-group"><label>잠금 화면 날짜 표시</label><input type="text" class="f-input" id="cfg-lock-date" value="10월 24일 토요일" oninput="sync()"></div>
             <div class="f-group"><label>잠금 비밀번호 (4자리 숫자로 홈 진입)</label><input type="text" class="f-input" id="cfg-pass" value="1234" maxlength="4" oninput="sync()"></div>
         </div>
 
-        <!-- Tab 1: Home Screen Settings & App Icons -->
-        <div class="panel" id="panel-p-home">
-            <div class="panel-title">📱 홈 화면 및 앱 커버 설정</div>
+        <!-- Tab 1: Home Screen & App Covers -->
+        <div class="panel" id="panel-home">
+            <div class="panel-title">📱 홈 화면 및 앱 아이콘 설정</div>
             <div class="f-group"><label>홈 화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'homeBg')"></div>
-            <div class="f-group"><label>메모 앱 아이콘 커버 (이모지 또는 이미지 파일)</label><input type="text" class="f-input" id="icon-memo" value="📝" oninput="sync()"></div>
-            <div class="f-group"><label>사진 앱 아이콘 커버</label><input type="text" class="f-input" id="icon-gallery" value="🖼️" oninput="sync()"></div>
-            <div class="f-group"><label>카메라 앱 아이콘 커버</label><input type="text" class="f-input" id="icon-camera" value="📷" oninput="sync()"></div>
-            <div class="f-group"><label>캘린더 앱 아이콘 커버</label><input type="text" class="f-input" id="icon-calendar" value="📅" oninput="sync()"></div>
-            <div class="f-group"><label>전화 앱 아이콘 커버 (독)</label><input type="text" class="f-input" id="icon-phone" value="📞" oninput="sync()"></div>
-            <div class="f-group"><label>카카오톡 앱 아이콘 커버 (독)</label><input type="text" class="f-input" id="icon-kakao" value="💬" oninput="sync()"></div>
-            <div class="f-group"><label>음악 앱 아이콘 커버 (독)</label><input type="text" class="f-input" id="icon-music" value="🎵" oninput="sync()"></div>
-            <div class="f-group"><label>인터넷 앱 아이콘 커버 (독)</label><input type="text" class="f-input" id="icon-safari" value="🌐" oninput="sync()"></div>
+            <div class="f-group"><label>메모 앱 아이콘</label><input type="text" class="f-input" id="icon-memo" value="📝" oninput="sync()"></div>
+            <div class="f-group"><label>사진 앱 아이콘</label><input type="text" class="f-input" id="icon-gallery" value="🖼️" oninput="sync()"></div>
+            <div class="f-group"><label>카메라 앱 아이콘</label><input type="text" class="f-input" id="icon-camera" value="📷" oninput="sync()"></div>
+            <div class="f-group"><label>캘린더 앱 아이콘</label><input type="text" class="f-input" id="icon-calendar" value="📅" oninput="sync()"></div>
+            <div class="f-group"><label>인스타그램 앱 아이콘</label><input type="text" class="f-input" id="icon-insta" value="📸" oninput="sync()"></div>
+            <div class="f-group"><label>전화 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-phone" value="📞" oninput="sync()"></div>
+            <div class="f-group"><label>카카오톡 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-kakao" value="💬" oninput="sync()"></div>
+            <div class="f-group"><label>음악 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-music" value="🎵" oninput="sync()"></div>
+            <div class="f-group"><label>인터넷 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-safari" value="🌐" oninput="sync()"></div>
         </div>
 
-        <!-- Tab 2: Kakao & Call -->
-        <div class="panel" id="panel-p-apps">
-            <div class="panel-title">💬 카카오톡 & 전화 시스템</div>
-            <div class="f-group"><label>카카오톡 상대방 이름</label><input type="text" class="f-input" id="cfg-kakao-name" value="수빈" oninput="sync()"></div>
-            <div class="f-group"><label>카카오톡 대화 내용 (줄바꿈으로 구분)</label><textarea class="f-input" id="cfg-kakao-chat" rows="3" oninput="sync()">오늘 저녁에 봐!
+        <!-- Tab 2: Memo App Settings -->
+        <div class="panel" id="panel-memo">
+            <div class="panel-title">📝 메모장 앱 개별 설정</div>
+            <div class="f-group"><label>메모 내용 작성</label><textarea class="f-input" id="cfg-memo" rows="5" oninput="sync()">비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음</textarea></div>
+        </div>
+
+        <!-- Tab 3: Gallery App Settings -->
+        <div class="panel" id="panel-gallery">
+            <div class="panel-title">🖼️ 사진(갤러리) 앱 개별 설정</div>
+            <div class="f-group"><label>사진 앨범에 추가할 이미지 파일 선택</label><input type="file" class="f-input" accept="image/*" multiple onchange="handleGalleryUpload(event)"></div>
+        </div>
+
+        <!-- Tab 4: KakaoTalk App Settings -->
+        <div class="panel" id="panel-kakao">
+            <div class="panel-title">💬 카카오톡 앱 개별 설정</div>
+            <div class="f-group"><label>상대방 이름</label><input type="text" class="f-input" id="cfg-kakao-name" value="수빈" oninput="sync()"></div>
+            <div class="f-group"><label>주고받은 대화 내용 (줄바꿈 구분)</label><textarea class="f-input" id="cfg-kakao-chat" rows="5" oninput="sync()">오늘 저녁에 봐!
 응 알겠어 장소로 갈게.</textarea></div>
         </div>
 
-        <!-- Tab 3: Notes & Gallery -->
-        <div class="panel" id="panel-p-notes">
-            <div class="panel-title">📝 메모장 & 사진 앨범 파일</div>
-            <div class="f-group"><label>메모장 내용</label><textarea class="f-input" id="cfg-memo" rows="3" oninput="sync()">비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음</textarea></div>
-            <div class="f-group"><label>갤러리 사진 추가 (내 기기 파일 다중 선택)</label><input type="file" class="f-input" accept="image/*" multiple onchange="handleGalleryUpload(event)"></div>
-        </div>
-
-        <!-- Tab 4: Calendar & Music -->
-        <div class="panel" id="panel-p-cal">
-            <div class="panel-title">📅 캘린더 & 음악 세팅</div>
+        <!-- Tab 5: More Apps (Instagram, Calendar, Music, Call) -->
+        <div class="panel" id="panel-more">
+            <div class="panel-title">✨ 기타 앱 개별 설정</div>
+            <div class="f-group"><label>인스타그램 피드 내용</label><input type="text" class="f-input" id="cfg-insta" value="오늘 하늘 예쁘다 ☁️" oninput="sync()"></div>
             <div class="f-group"><label>캘린더 일정 내용</label><input type="text" class="f-input" id="cfg-cal" value="12월 5일: 중요한 데이트" oninput="sync()"></div>
             <div class="f-group"><label>음악 플레이어 (곡 제목 / 가수)</label><input type="text" class="f-input" id="cfg-music" value="Attention - NewJeans" oninput="sync()"></div>
         </div>
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v2')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v3')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
-        lockTime: '09:41',
         lockDate: '10월 24일 토요일',
         pass: '1234',
-        icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' },
+        icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', insta: '📸', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' },
         kakaoName: '수빈',
         kakaoChat: '오늘 저녁에 봐!\n응 알겠어 장소로 갈게.',
         memo: '비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음',
         photos: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500'],
+        instaPost: '오늘 하늘 예쁘다 ☁️',
         cal: '12월 5일: 중요한 데이트',
         musicInfo: 'Attention - NewJeans'
     };
 
     let passInput = '';
 
-    // Handle File Uploads (Convert to Base64)
+    // Realtime Clock System
+    function updateRealtimeClock() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const timeStr = `${hours}:${minutes}`;
+
+        document.getElementById('st-time').innerText = timeStr;
+        document.getElementById('lk-time').innerText = timeStr;
+    }
+    setInterval(updateRealtimeClock, 1000);
+    updateRealtimeClock();
+
+    // Handle File Uploads (Base64)
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -308,13 +329,13 @@
     }
 
     function sync() {
-        db.lockTime = document.getElementById('cfg-lock-time').value;
         db.lockDate = document.getElementById('cfg-lock-date').value;
         db.pass = document.getElementById('cfg-pass').value;
         db.icons.memo = document.getElementById('icon-memo').value;
         db.icons.gallery = document.getElementById('icon-gallery').value;
         db.icons.camera = document.getElementById('icon-camera').value;
         db.icons.calendar = document.getElementById('icon-calendar').value;
+        db.icons.insta = document.getElementById('icon-insta').value;
         db.icons.phone = document.getElementById('icon-phone').value;
         db.icons.kakao = document.getElementById('icon-kakao').value;
         db.icons.music = document.getElementById('icon-music').value;
@@ -322,6 +343,7 @@
         db.kakaoName = document.getElementById('cfg-kakao-name').value;
         db.kakaoChat = document.getElementById('cfg-kakao-chat').value;
         db.memo = document.getElementById('cfg-memo').value;
+        db.instaPost = document.getElementById('cfg-insta').value;
         db.cal = document.getElementById('cfg-cal').value;
         db.musicInfo = document.getElementById('cfg-music').value;
 
@@ -329,24 +351,25 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('ios_world_db_v2', JSON.stringify(db));
+        localStorage.setItem('ios_world_db_v3', JSON.stringify(db));
         renderPhone();
     }
 
     function renderPhone() {
         document.getElementById('lock-screen').style.backgroundImage = `url('${db.lockBg}')`;
         document.getElementById('home-screen').style.backgroundImage = `url('${db.homeBg}')`;
-        document.getElementById('lk-time').innerText = db.lockTime;
         document.getElementById('lk-date').innerText = db.lockDate;
-        document.getElementById('st-time').innerText = db.lockTime;
 
+        // Main Grid Apps (메모, 사진, 카메라, 캘린더, 인스타그램)
         const mainApps = [
             { id: 'memo', name: '메모', icon: db.icons.memo },
             { id: 'gallery', name: '사진', icon: db.icons.gallery },
             { id: 'camera', name: '카메라', icon: db.icons.camera },
-            { id: 'calendar', name: '캘린더', icon: db.icons.calendar }
+            { id: 'calendar', name: '캘린더', icon: db.icons.calendar },
+            { id: 'insta', name: '인스타그램', icon: db.icons.insta }
         ];
 
+        // Dock Apps (전화, 카카오톡, 음악, 인터넷)
         const dockApps = [
             { id: 'phone', name: '전화', icon: db.icons.phone },
             { id: 'kakao', name: '카카오톡', icon: db.icons.kakao },
@@ -365,7 +388,7 @@
     function createAppNode(app) {
         const item = document.createElement('div');
         item.className = 'app-item';
-        item.onclick = () => openApp(app.id);
+        item.onclick = (e) => { e.stopPropagation(); openApp(app.id); };
         const isImg = app.icon.startsWith('http') || app.icon.startsWith('data:image');
         const bgStyle = isImg ? `background-image: url('${app.icon}'); background-size: cover;` : 'background: rgba(255,255,255,0.3); backdrop-filter:blur(10px);';
         const txt = isImg ? '' : app.icon;
@@ -384,6 +407,14 @@
         document.getElementById('lock-screen').classList.remove('active');
         document.getElementById('passcode-screen').classList.add('active');
         passInput = ''; updateDots();
+    }
+
+    // Passcode Screen 빈 공간 터치 시 잠금화면으로 복귀
+    function checkOutsidePassClick(e) {
+        if (e.target.id === 'passcode-screen') {
+            document.getElementById('passcode-screen').classList.remove('active');
+            document.getElementById('lock-screen').classList.add('active');
+        }
     }
 
     function pressKey(num) {
@@ -406,6 +437,7 @@
         document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('filled', i < passInput.length));
     }
 
+    // App Real Systems
     function openApp(id) {
         const view = document.getElementById('app-view');
         const body = document.getElementById('app-body');
@@ -430,6 +462,13 @@
             body.innerHTML = `<div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                 <h3 style="color:#ff3b30; margin-bottom:8px;">오늘의 일정</h3>
                 <p style="font-size:14px;">${db.cal}</p>
+            </div>`;
+        } else if (id === 'insta') {
+            title.innerText = '인스타그램';
+            body.innerHTML = `<div style="background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                <div style="font-weight:600; margin-bottom:8px;">@persona_user</div>
+                <div style="background:#eee; height:200px; border-radius:8px; display:flex; justify-content:center; align-items:center; font-size:24px; margin-bottom:8px;">📸</div>
+                <p style="font-size:13px;">${db.instaPost}</p>
             </div>`;
         } else if (id === 'phone') {
             title.innerText = '전화';
@@ -470,20 +509,21 @@
     }
 
     // Init Inputs
-    document.getElementById('cfg-lock-time').value = db.lockTime;
     document.getElementById('cfg-lock-date').value = db.lockDate;
     document.getElementById('cfg-pass').value = db.pass;
     document.getElementById('icon-memo').value = db.icons.memo;
     document.getElementById('icon-gallery').value = db.icons.gallery;
     document.getElementById('icon-camera').value = db.icons.camera;
     document.getElementById('icon-calendar').value = db.icons.calendar;
+    document.getElementById('icon-insta').value = db.icons.insta;
     document.getElementById('icon-phone').value = db.icons.phone;
     document.getElementById('icon-kakao').value = db.icons.kakao;
     document.getElementById('icon-music').value = db.icons.music;
     document.getElementById('icon-safari').value = db.icons.safari;
+    document.getElementById('cfg-memo').value = db.memo;
     document.getElementById('cfg-kakao-name').value = db.kakaoName;
     document.getElementById('cfg-kakao-chat').value = db.kakaoChat;
-    document.getElementById('cfg-memo').value = db.memo;
+    document.getElementById('cfg-insta').value = db.instaPost;
     document.getElementById('cfg-cal').value = db.cal;
     document.getElementById('cfg-music').value = db.musicInfo;
 

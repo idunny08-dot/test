@@ -43,7 +43,7 @@
             box-shadow: 0 16px 40px rgba(0,0,0,0.25);
         }
 
-        /* Dynamic Island (다이내믹 아일랜드) */
+        /* Dynamic Island */
         .dynamic-island {
             position: absolute;
             top: 10px; left: 50%;
@@ -54,7 +54,7 @@
             z-index: 550;
         }
 
-        /* iOS Real Status Bar (키워진 아이콘 크기 & 세로 4줄 셀룰러) */
+        /* Status Bar */
         .status-bar {
             position: absolute; top: 0; width: 100%; height: 48px;
             padding: 0 24px; display: flex; justify-content: space-between; align-items: center;
@@ -78,17 +78,15 @@
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; }
         .screen.active { display: flex; }
 
-        /* Lock Screen (부드러운 슬라이드 애니메이션) */
+        /* Lock Screen (부드러운 슬라이딩 엔진 적용) */
         #lock-screen {
             justify-content: space-between; align-items: center;
             padding: 75px 20px 30px; text-align: center; color: #fff;
             background-size: cover; background-position: center;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            touch-action: none;
+            transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
+            touch-action: none; cursor: pointer;
         }
-        #lock-screen.swiped {
-            transform: translateY(-100%);
-        }
+        #lock-screen.swiped { transform: translateY(-100%); }
         .lock-date { font-size: 19px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .lock-time { font-size: 82px; font-weight: 200; letter-spacing: -2px; margin-top: -6px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
         .home-indicator-bar {
@@ -102,7 +100,7 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Passcode Screen (더 크고 동그란 버튼) */
+        /* Passcode Screen */
         #passcode-screen {
             background: rgba(0,0,0,0.75); backdrop-filter: blur(35px);
             color: #fff; justify-content: center; align-items: center; gap: 24px; z-index: 600;
@@ -136,7 +134,7 @@
             border-radius: 28px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px;
         }
 
-        /* App Inside Views */
+        /* App Inside View */
         .app-view {
             position: absolute; inset: 0; background: #fff; color: #000;
             z-index: 700; display: none; flex-direction: column;
@@ -147,7 +145,7 @@
             display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 14px;
             margin-top: 30px; background: #fcfcfc;
         }
-        .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #f2f2f7; }
+        .app-view-body { flex: 1; padding: 16px; overflow-y: auto; background: #ffffff; }
 
         /* 🛠️ EDITOR DASHBOARD */
         .editor-dashboard {
@@ -155,14 +153,14 @@
             border-radius: 24px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
         }
         .editor-tabs {
-            display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px;
-            margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid #f2f2f7;
+            display: flex; overflow-x: auto; gap: 6px;
+            margin-bottom: 20px; padding-bottom: 8px; border-bottom: 1px solid #f2f2f7;
         }
         .tab-btn {
-            height: 40px; border-radius: 10px; background: #f2f2f7;
-            display: flex; justify-content: center; align-items: center; font-size: 16px; cursor: pointer;
+            flex-shrink: 0; height: 38px; padding: 0 12px; border-radius: 10px; background: #f2f2f7;
+            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: 600; cursor: pointer;
         }
-        .tab-btn.active { background: #e8f0fe; color: #007aff; }
+        .tab-btn.active { background: #007aff; color: #ffffff; }
         .panel { display: none; flex-direction: column; gap: 12px; }
         .panel.active { display: flex; }
         .panel-title { font-size: 15px; font-weight: 700; }
@@ -183,14 +181,11 @@
 
     <!-- 📱 LIVE PHONE -->
     <div class="iphone-frame" id="phone-root">
-        <!-- Dynamic Island -->
         <div class="dynamic-island"></div>
 
-        <!-- Real Status Bar -->
         <div class="status-bar">
             <span id="st-time">09:41</span>
             <div class="status-icons">
-                <!-- 4 Signal Bars -->
                 <div class="signal-bars">
                     <div class="signal-bar" style="height: 3px;"></div>
                     <div class="signal-bar" style="height: 6px;"></div>
@@ -202,8 +197,8 @@
             </div>
         </div>
 
-        <!-- 1. Lock Screen (Swipe Up Event) -->
-        <div class="screen active" id="lock-screen">
+        <!-- 1. Lock Screen (클릭 시 해당 에디터 연동) -->
+        <div class="screen active" id="lock-screen" onclick="syncTabTo('lock')">
             <div>
                 <div class="lock-date" id="lk-date">10월 24일 토요일</div>
                 <div class="lock-time" id="lk-time">09:41</div>
@@ -236,8 +231,8 @@
             </div>
         </div>
 
-        <!-- 3. Home Screen -->
-        <div class="screen" id="home-screen">
+        <!-- 3. Home Screen (빈 곳 클릭 시 홈화면 에디터 연동) -->
+        <div class="screen" id="home-screen" onclick="syncTabTo('home')">
             <div class="app-grid" id="main-grid"></div>
             <div class="dock" id="dock-grid"></div>
         </div>
@@ -253,88 +248,103 @@
         </div>
     </div>
 
-    <!-- 🛠️ EDITOR DASHBOARD -->
+    <!-- 🛠️ EDITOR DASHBOARD (1:1 앱 개별 연동 에디터) -->
     <div class="editor-dashboard">
-        <div class="editor-tabs">
-            <div class="tab-btn active" onclick="switchTab(0, 'lock')">🔒</div>
-            <div class="tab-btn" onclick="switchTab(1, 'home')">📱</div>
-            <div class="tab-btn" onclick="switchTab(2, 'memo')">📝</div>
-            <div class="tab-btn" onclick="switchTab(3, 'gallery')">🖼️</div>
-            <div class="tab-btn" onclick="switchTab(4, 'kakao')">💬</div>
-            <div class="tab-btn" onclick="switchTab(5, 'more')">✨</div>
+        <div class="editor-tabs" id="editor-tabs-bar">
+            <div class="tab-btn active" id="tab-btn-lock" onclick="switchTab('lock')">🔒 잠금화면</div>
+            <div class="tab-btn" id="tab-btn-home" onclick="switchTab('home')">📱 홈화면</div>
+            <div class="tab-btn" id="tab-btn-memo" onclick="switchTab('memo')">📝 메모</div>
+            <div class="tab-btn" id="tab-btn-gallery" onclick="switchTab('gallery')">🖼️ 사진</div>
+            <div class="tab-btn" id="tab-btn-camera" onclick="switchTab('camera')">📷 카메라</div>
+            <div class="tab-btn" id="tab-btn-calendar" onclick="switchTab('calendar')">📅 캘린더</div>
+            <div class="tab-btn" id="tab-btn-insta" onclick="switchTab('insta')">📸 인스타</div>
+            <div class="tab-btn" id="tab-btn-phone" onclick="switchTab('phone')">📞 전화</div>
+            <div class="tab-btn" id="tab-btn-kakao" onclick="switchTab('kakao')">💬 카톡</div>
+            <div class="tab-btn" id="tab-btn-music" onclick="switchTab('music')">🎵 음악</div>
+            <div class="tab-btn" id="tab-btn-safari" onclick="switchTab('safari')">🌐 인터넷</div>
         </div>
 
-        <!-- Tab 0: Lock Screen -->
+        <!-- 🔒 잠금화면 편집 -->
         <div class="panel active" id="panel-lock">
-            <div class="panel-title">🔒 잠금 화면 설정</div>
-            <div class="f-group"><label>잠금 화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'lockBg')"></div>
-            <div class="f-group"><label>잠금 화면 날짜 표시</label><input type="text" class="f-input" id="cfg-lock-date" value="10월 24일 토요일" oninput="sync()"></div>
+            <div class="panel-title">🔒 잠금화면 편집</div>
+            <div class="f-group"><label>잠금화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'lockBg')"></div>
+            <div class="f-group"><label>잠금화면 날짜 표시</label><input type="text" class="f-input" id="cfg-lock-date" value="10월 24일 토요일" oninput="sync()"></div>
             <div class="f-group"><label>잠금 비밀번호 (4자리 숫자로 홈 진입)</label><input type="text" class="f-input" id="cfg-pass" value="1234" maxlength="4" oninput="sync()"></div>
         </div>
 
-        <!-- Tab 1: Home Screen & App Covers -->
+        <!-- 📱 홈화면 편집 -->
         <div class="panel" id="panel-home">
-            <div class="panel-title">📱 홈 화면 및 앱 아이콘 설정</div>
-            <div class="f-group"><label>홈 화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'homeBg')"></div>
-            <div class="f-group"><label>메모 앱 아이콘</label><input type="text" class="f-input" id="icon-memo" value="📝" oninput="sync()"></div>
-            <div class="f-group"><label>사진 앱 아이콘</label><input type="text" class="f-input" id="icon-gallery" value="🖼️" oninput="sync()"></div>
-            <div class="f-group"><label>카메라 앱 아이콘</label><input type="text" class="f-input" id="icon-camera" value="📷" oninput="sync()"></div>
-            <div class="f-group"><label>캘린더 앱 아이콘</label><input type="text" class="f-input" id="icon-calendar" value="📅" oninput="sync()"></div>
-            <div class="f-group"><label>인스타그램 앱 아이콘</label><input type="text" class="f-input" id="icon-insta" value="📸" oninput="sync()"></div>
-            <div class="f-group"><label>전화 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-phone" value="📞" oninput="sync()"></div>
-            <div class="f-group"><label>카카오톡 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-kakao" value="💬" oninput="sync()"></div>
-            <div class="f-group"><label>음악 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-music" value="🎵" oninput="sync()"></div>
-            <div class="f-group"><label>인터넷 앱 아이콘 (독)</label><input type="text" class="f-input" id="icon-safari" value="🌐" oninput="sync()"></div>
+            <div class="panel-title">📱 홈화면 배경 편집</div>
+            <div class="f-group"><label>홈화면 배경 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleFileUpload(event, 'homeBg')"></div>
         </div>
 
-        <!-- Tab 2: Memo App Settings -->
+        <!-- 📝 메모 앱 편집 -->
         <div class="panel" id="panel-memo">
-            <div class="panel-title">📝 메모장 앱 개별 설정</div>
-            <div class="f-group"><label>메모 내용 작성</label><textarea class="f-input" id="cfg-memo" rows="5" oninput="sync()">비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음</textarea></div>
+            <div class="panel-title">📝 메모 앱 편집</div>
+            <div class="f-group"><label>메모 앱 아이콘 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'memo')"></div>
         </div>
 
-        <!-- Tab 3: Gallery App Settings -->
+        <!-- 🖼️ 사진 앱 편집 -->
         <div class="panel" id="panel-gallery">
-            <div class="panel-title">🖼️ 사진(갤러리) 앱 개별 설정</div>
-            <div class="f-group"><label>사진 앨범에 추가할 이미지 파일 선택</label><input type="file" class="f-input" accept="image/*" multiple onchange="handleGalleryUpload(event)"></div>
+            <div class="panel-title">🖼️ 사진 앱 편집</div>
+            <div class="f-group"><label>사진 앱 아이콘 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'gallery')"></div>
         </div>
 
-        <!-- Tab 4: KakaoTalk App Settings -->
+        <!-- 📷 카메라 앱 편집 -->
+        <div class="panel" id="panel-camera">
+            <div class="panel-title">📷 카메라 앱 편집</div>
+            <div class="f-group"><label>카메라 앱 아이콘 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'camera')"></div>
+        </div>
+
+        <!-- 📅 캘린더 앱 편집 -->
+        <div class="panel" id="panel-calendar">
+            <div class="panel-title">📅 캘린더 앱 편집</div>
+            <div class="f-group"><label>캘린더 앱 아이콘 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'calendar')"></div>
+        </div>
+
+        <!-- 📸 인스타그램 앱 편집 -->
+        <div class="panel" id="panel-insta">
+            <div class="panel-title">📸 인스타그램 앱 편집</div>
+            <div class="f-group"><label>인스타그램 앱 아이콘 사진 업로드</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'insta')"></div>
+        </div>
+
+        <!-- 📞 전화 앱 편집 -->
+        <div class="panel" id="panel-phone">
+            <div class="panel-title">📞 전화 앱 편집</div>
+            <div class="f-group"><label>전화 앱 아이콘 사진 업로드 (독)</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'phone')"></div>
+        </div>
+
+        <!-- 💬 카카오톡 앱 편집 -->
         <div class="panel" id="panel-kakao">
-            <div class="panel-title">💬 카카오톡 앱 개별 설정</div>
-            <div class="f-group"><label>상대방 이름</label><input type="text" class="f-input" id="cfg-kakao-name" value="수빈" oninput="sync()"></div>
-            <div class="f-group"><label>주고받은 대화 내용 (줄바꿈 구분)</label><textarea class="f-input" id="cfg-kakao-chat" rows="5" oninput="sync()">오늘 저녁에 봐!
-응 알겠어 장소로 갈게.</textarea></div>
+            <div class="panel-title">💬 카카오톡 앱 편집</div>
+            <div class="f-group"><label>카카오톡 앱 아이콘 사진 업로드 (독)</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'kakao')"></div>
         </div>
 
-        <!-- Tab 5: More Apps -->
-        <div class="panel" id="panel-more">
-            <div class="panel-title">✨ 기타 앱 개별 설정</div>
-            <div class="f-group"><label>인스타그램 피드 내용</label><input type="text" class="f-input" id="cfg-insta" value="오늘 하늘 예쁘다 ☁️" oninput="sync()"></div>
-            <div class="f-group"><label>캘린더 일정 내용</label><input type="text" class="f-input" id="cfg-cal" value="12월 5일: 중요한 데이트" oninput="sync()"></div>
-            <div class="f-group"><label>음악 플레이어 (곡 제목 / 가수)</label><input type="text" class="f-input" id="cfg-music" value="Attention - NewJeans" oninput="sync()"></div>
+        <!-- 🎵 음악 앱 편집 -->
+        <div class="panel" id="panel-music">
+            <div class="panel-title">🎵 음악 앱 편집</div>
+            <div class="f-group"><label>음악 앱 아이콘 사진 업로드 (독)</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'music')"></div>
+        </div>
+
+        <!-- 🌐 인터넷 앱 편집 -->
+        <div class="panel" id="panel-safari">
+            <div class="panel-title">🌐 인터넷 앱 편집</div>
+            <div class="f-group"><label>인터넷 앱 아이콘 사진 업로드 (독)</label><input type="file" class="f-input" accept="image/*" onchange="handleIconUpload(event, 'safari')"></div>
         </div>
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v4')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v5')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
         pass: '1234',
-        icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', insta: '📸', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' },
-        kakaoName: '수빈',
-        kakaoChat: '오늘 저녁에 봐!\n응 알겠어 장소로 갈게.',
-        memo: '비밀 다이어리:\n1. 오늘 기분 좋음\n2. 내일 약속 있음',
-        photos: ['https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500', 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=500'],
-        instaPost: '오늘 하늘 예쁘다 ☁️',
-        cal: '12월 5일: 중요한 데이트',
-        musicInfo: 'Attention - NewJeans'
+        icons: { memo: '📝', gallery: '🖼️', camera: '📷', calendar: '📅', insta: '📸', phone: '📞', kakao: '💬', music: '🎵', safari: '🌐' }
     };
 
     let passInput = '';
 
-    // Realtime Clock System (현실 시간 연동)
+    // Realtime Clock System
     function updateRealtimeClock() {
         const now = new Date();
         const hours = String(now.getHours()).padStart(2, '0');
@@ -347,7 +357,7 @@
     setInterval(updateRealtimeClock, 1000);
     updateRealtimeClock();
 
-    // Swipe Up Gesture for Unlock (아래에서 위로 쓸어올리기)
+    // Smooth Swipe Up System
     const lockScreen = document.getElementById('lock-screen');
     let startY = 0;
     let isSwiping = false;
@@ -377,19 +387,6 @@
         isSwiping = false;
     });
 
-    // Mouse Fallback for Desktop Test
-    lockScreen.addEventListener('mousedown', (e) => {
-        startY = e.clientY;
-        isSwiping = true;
-    });
-    lockScreen.addEventListener('mouseup', (e) => {
-        if (!isSwiping) return;
-        if (startY - e.clientY > 40) {
-            triggerPasscodeScreen();
-        }
-        isSwiping = false;
-    });
-
     function triggerPasscodeScreen() {
         lockScreen.classList.add('swiped');
         setTimeout(() => {
@@ -406,6 +403,27 @@
         }
     }
 
+    // 1:1 Editor Tab Switch & Sync
+    function switchTab(panelId) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+        const targetBtn = document.getElementById('tab-btn-' + panelId);
+        const targetPanel = document.getElementById('panel-' + panelId);
+
+        if (targetBtn) targetBtn.classList.add('active');
+        if (targetPanel) targetPanel.classList.add('active');
+
+        if (targetBtn) {
+            targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    function syncTabTo(panelId) {
+        switchTab(panelId);
+    }
+
+    // File Uploads (Base64)
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -417,43 +435,25 @@
         reader.readAsDataURL(file);
     }
 
-    function handleGalleryUpload(event) {
-        const files = event.target.files;
-        if (!files.length) return;
-        for (let i = 0; i < files.length; i++) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                db.photos.push(e.target.result);
-                saveAndRender();
-            };
-            reader.readAsDataURL(files[i]);
-        }
+    function handleIconUpload(event, appId) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            db.icons[appId] = e.target.result;
+            saveAndRender();
+        };
+        reader.readAsDataURL(file);
     }
 
     function sync() {
         db.lockDate = document.getElementById('cfg-lock-date').value;
         db.pass = document.getElementById('cfg-pass').value;
-        db.icons.memo = document.getElementById('icon-memo').value;
-        db.icons.gallery = document.getElementById('icon-gallery').value;
-        db.icons.camera = document.getElementById('icon-camera').value;
-        db.icons.calendar = document.getElementById('icon-calendar').value;
-        db.icons.insta = document.getElementById('icon-insta').value;
-        db.icons.phone = document.getElementById('icon-phone').value;
-        db.icons.kakao = document.getElementById('icon-kakao').value;
-        db.icons.music = document.getElementById('icon-music').value;
-        db.icons.safari = document.getElementById('icon-safari').value;
-        db.kakaoName = document.getElementById('cfg-kakao-name').value;
-        db.kakaoChat = document.getElementById('cfg-kakao-chat').value;
-        db.memo = document.getElementById('cfg-memo').value;
-        db.instaPost = document.getElementById('cfg-insta').value;
-        db.cal = document.getElementById('cfg-cal').value;
-        db.musicInfo = document.getElementById('cfg-music').value;
-
         saveAndRender();
     }
 
     function saveAndRender() {
-        localStorage.setItem('ios_world_db_v4', JSON.stringify(db));
+        localStorage.setItem('ios_world_db_v5', JSON.stringify(db));
         renderPhone();
     }
 
@@ -488,19 +488,17 @@
     function createAppNode(app) {
         const item = document.createElement('div');
         item.className = 'app-item';
-        item.onclick = (e) => { e.stopPropagation(); openApp(app.id); };
+        item.onclick = (e) => {
+            e.stopPropagation();
+            syncTabTo(app.id);
+            openApp(app.id);
+        };
         const isImg = app.icon.startsWith('http') || app.icon.startsWith('data:image');
         const bgStyle = isImg ? `background-image: url('${app.icon}'); background-size: cover;` : 'background: rgba(255,255,255,0.3); backdrop-filter:blur(10px);';
         const txt = isImg ? '' : app.icon;
 
         item.innerHTML = `<div class="app-icon" style="${bgStyle}">${txt}</div><div class="app-label">${app.name}</div>`;
         return item;
-    }
-
-    function switchTab(idx, panelId) {
-        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === idx));
-        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-        document.getElementById('panel-' + panelId).classList.add('active');
     }
 
     function pressKey(num) {
@@ -511,6 +509,7 @@
                     if (passInput === db.pass) {
                         document.getElementById('passcode-screen').classList.remove('active');
                         document.getElementById('home-screen').classList.add('active');
+                        switchTab('home');
                     } else {
                         alert('비밀번호가 틀렸습니다.'); passInput = ''; updateDots();
                     }
@@ -528,63 +527,13 @@
         const body = document.getElementById('app-body');
         const title = document.getElementById('app-title');
 
-        if (id === 'memo') {
-            title.innerText = '메모';
-            body.innerHTML = `<textarea style="width:100%; height:100%; border:none; background:transparent; font-size:15px; outline:none;" readonly>${db.memo}</textarea>`;
-        } else if (id === 'gallery') {
-            title.innerText = '사진';
-            body.innerHTML = `<div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;">
-                ${db.photos.map(u => `<img src="${u}" style="width:100%; height:110px; object-fit:cover; border-radius:6px;">`).join('')}
-            </div>`;
-        } else if (id === 'camera') {
-            title.innerText = '카메라';
-            body.innerHTML = `<div style="background:#000; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; border-radius:12px;">
-                <div style="font-size:40px; margin-bottom:20px;">📷</div>
-                <div style="border:4px solid #fff; width:60px; height:60px; border-radius:50%; cursor:pointer;" onclick="alert('찰칵! 사진이 촬영되었습니다.')"></div>
-            </div>`;
-        } else if (id === 'calendar') {
-            title.innerText = '캘린더';
-            body.innerHTML = `<div style="background:#fff; padding:15px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                <h3 style="color:#ff3b30; margin-bottom:8px;">오늘의 일정</h3>
-                <p style="font-size:14px;">${db.cal}</p>
-            </div>`;
-        } else if (id === 'insta') {
-            title.innerText = '인스타그램';
-            body.innerHTML = `<div style="background:#fff; border-radius:12px; padding:12px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
-                <div style="font-weight:600; margin-bottom:8px;">@persona_user</div>
-                <div style="background:#eee; height:200px; border-radius:8px; display:flex; justify-content:center; align-items:center; font-size:24px; margin-bottom:8px;">📸</div>
-                <p style="font-size:13px;">${db.instaPost}</p>
-            </div>`;
-        } else if (id === 'phone') {
-            title.innerText = '전화';
-            body.innerHTML = `<div style="text-align:center; padding-top:20px;">
-                <div style="font-size:24px; font-weight:600; margin-bottom:20px;" id="dial-num">010-1234-5678</div>
-                <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; width:80%; margin:auto;">
-                    ${['1','2','3','4','5','6','7','8','9','*','0','#'].map(n => `<div style="background:#e5e5ea; padding:15px; border-radius:50%; font-size:18px; font-weight:600; cursor:pointer;" onclick="document.getElementById('dial-num').innerText+='${n}'">${n}</div>`).join('')}
-                </div>
-            </div>`;
-        } else if (id === 'kakao') {
-            title.innerText = db.kakaoName;
-            body.innerHTML = db.kakaoChat.split('\n').map(t => `
-                <div style="background:#fee500; color:#000; padding:10px 14px; border-radius:14px; margin-bottom:8px; max-width:80%; font-size:14px;">${t}</div>
-            `).join('');
-        } else if (id === 'music') {
-            title.innerText = '음악';
-            body.innerHTML = `<div style="text-align:center; padding-top:40px;">
-                <div style="font-size:60px; margin-bottom:20px;">🎵</div>
-                <h3 style="font-size:18px; margin-bottom:10px;">${db.musicInfo}</h3>
-                <p style="font-size:13px; color:#8e8e93; margin-bottom:30px;">Apple Music 재생 중</p>
-                <div style="font-size:28px; display:flex; justify-content:center; gap:20px; cursor:pointer;">
-                    <span>⏮️</span><span onclick="alert('재생/일시정지')">⏸️</span><span>⏭️</span>
-                </div>
-            </div>`;
-        } else if (id === 'safari') {
-            title.innerText = '인터넷 (Safari)';
-            body.innerHTML = `<div>
-                <input type="text" value="https://www.google.com" style="width:100%; padding:10px; border-radius:10px; border:1px solid #ccc; background:#e5e5ea; font-size:13px; text-align:center; margin-bottom:20px;" readonly>
-                <div style="text-align:center; padding-top:50px; opacity:0.6;">안전한 브라우징 모드</div>
-            </div>`;
-        }
+        const appNames = {
+            memo: '메모', gallery: '사진', camera: '카메라', calendar: '캘린더',
+            insta: '인스타그램', phone: '전화', kakao: '카카오톡', music: '음악', safari: '인터넷'
+        };
+
+        title.innerText = appNames[id] || '앱';
+        body.innerHTML = `<div style="display:flex; justify-content:center; align-items:center; height:100%; color:#8e8e93; font-size:14px;">[ ${appNames[id]} 앱 내부 시스템 준비 중 ]</div>`;
 
         view.classList.add('active');
     }
@@ -596,21 +545,6 @@
     // Init Inputs
     document.getElementById('cfg-lock-date').value = db.lockDate;
     document.getElementById('cfg-pass').value = db.pass;
-    document.getElementById('icon-memo').value = db.icons.memo;
-    document.getElementById('icon-gallery').value = db.icons.gallery;
-    document.getElementById('icon-camera').value = db.icons.camera;
-    document.getElementById('icon-calendar').value = db.icons.calendar;
-    document.getElementById('icon-insta').value = db.icons.insta;
-    document.getElementById('icon-phone').value = db.icons.phone;
-    document.getElementById('icon-kakao').value = db.icons.kakao;
-    document.getElementById('icon-music').value = db.icons.music;
-    document.getElementById('icon-safari').value = db.icons.safari;
-    document.getElementById('cfg-memo').value = db.memo;
-    document.getElementById('cfg-kakao-name').value = db.kakaoName;
-    document.getElementById('cfg-kakao-chat').value = db.kakaoChat;
-    document.getElementById('cfg-insta').value = db.instaPost;
-    document.getElementById('cfg-cal').value = db.cal;
-    document.getElementById('cfg-music').value = db.musicInfo;
 
     renderPhone();
 </script>

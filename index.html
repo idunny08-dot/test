@@ -34,7 +34,7 @@
             padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
         }
 
-        /* 📱 LIVE PHONE (여유 있는 크기 설정) */
+        /* 📱 LIVE PHONE */
         .iphone-frame {
             width: 100%; max-width: 350px; height: 680px;
             margin: 15px 0; border-radius: 44px; border: 10px solid #1c1c1e;
@@ -54,10 +54,10 @@
             z-index: 550;
         }
 
-        /* Status Bar (다이내믹 아일랜드와 완벽한 간격 조화) */
+        /* Status Bar (시간을 조금 더 오른쪽으로 이동) */
         .status-bar {
             position: absolute; top: 0; width: 100%; height: 46px;
-            padding: 0 22px; display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px 0 28px; display: flex; justify-content: space-between; align-items: center;
             font-size: 14px; font-weight: 600; color: #fff; z-index: 500;
             text-shadow: 0 1px 3px rgba(0,0,0,0.7);
         }
@@ -82,11 +82,8 @@
         #lock-screen {
             justify-content: space-between; align-items: center;
             padding: 70px 20px 25px; text-align: center; color: #fff;
-            background-size: cover; background-position: center;
-            transition: transform 0.45s cubic-bezier(0.19, 1, 0.22, 1);
-            touch-action: none; cursor: pointer;
+            background-size: cover; background-position: center; cursor: pointer;
         }
-        #lock-screen.swiped { transform: translateY(-100%); }
         .lock-date { font-size: 17px; font-weight: 500; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         .lock-time { font-size: 78px; font-weight: 200; letter-spacing: -2px; margin-top: -4px; text-shadow: 0 2px 6px rgba(0,0,0,0.8); }
         .home-indicator-bar {
@@ -100,21 +97,37 @@
             50% { transform: translateY(-5px); }
         }
 
-        /* Passcode Screen */
+        /* Passcode Sheet Screen (하단에서 반만 부드럽게 올라오는 시트) */
         #passcode-screen {
-            background: rgba(0,0,0,0.75); backdrop-filter: blur(35px);
-            color: #fff; justify-content: center; align-items: center; gap: 20px; z-index: 600;
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.65); backdrop-filter: blur(35px);
+            color: #fff; display: flex; flex-direction: column;
+            justify-content: flex-end; align-items: center;
+            z-index: 600;
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
         }
-        .pass-dots { display: flex; gap: 14px; }
+        #passcode-screen.active { transform: translateY(0); }
+        
+        .passcode-sheet {
+            width: 100%; height: 75%;
+            background: rgba(28, 28, 30, 0.65); backdrop-filter: blur(40px);
+            border-radius: 36px 36px 0 0;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 30px 20px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+        }
+
+        .pass-dots { display: flex; gap: 14px; margin-bottom: 25px; }
         .dot { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid #fff; }
         .dot.filled { background: #fff; }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 18px; width: 75%; }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 18px; width: 80%; max-width: 280px; }
         .key {
-            width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.22);
+            width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.18);
             display: flex; justify-content: center; align-items: center; font-size: 26px; font-weight: 400;
             margin: auto; cursor: pointer; transition: background 0.15s ease;
         }
-        .key:active { background: rgba(255,255,255,0.45); }
+        .key:active { background: rgba(255,255,255,0.4); }
 
         /* Home Screen */
         #home-screen {
@@ -134,7 +147,7 @@
             border-radius: 24px; display: flex; justify-content: space-around; align-items: center; padding: 0 8px;
         }
 
-        /* App Inside View (하단 제스처바로 홈 복귀 지원) */
+        /* App Inside View */
         .app-view {
             position: absolute; inset: 0; background: #fff; color: #000;
             z-index: 700; display: none; flex-direction: column;
@@ -207,17 +220,18 @@
                 <div class="lock-date" id="lk-date">10월 24일 토요일</div>
                 <div class="lock-time" id="lk-time">09:41</div>
             </div>
-            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:5px;" id="swipe-trigger-area">
                 <div style="font-size: 11px; opacity: 0.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">위로 쓸어올려서 잠금해제</div>
                 <div class="home-indicator-bar"></div>
             </div>
         </div>
 
-        <!-- 2. Passcode Screen -->
+        <!-- 2. Passcode Sheet Screen -->
         <div class="screen" id="passcode-screen" onclick="checkOutsidePassClick(event)">
-            <div style="text-align: center; z-index: 10;" id="passcode-inner-box">
-                <div style="font-size:14px; font-weight: 500; margin-bottom: 15px;">비밀번호 입력</div>
-                <div class="pass-dots" id="p-dots" style="justify-content: center; margin-bottom: 20px;">
+            <div class="passcode-sheet" id="passcode-sheet-box">
+                <div style="width: 36px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-bottom: 20px;"></div>
+                <div style="font-size:14px; font-weight: 500; margin-bottom: 15px;">암호 입력</div>
+                <div class="pass-dots" id="p-dots">
                     <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
                 </div>
                 <div class="keypad">
@@ -341,7 +355,7 @@
     </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('ios_world_db_v6')) || {
+    let db = JSON.parse(localStorage.getItem('ios_world_db_v8')) || {
         lockBg: 'https://images.unsplash.com/photo-1557683316-973673baf926?w=800',
         homeBg: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800',
         lockDate: '10월 24일 토요일',
@@ -364,7 +378,7 @@
     setInterval(updateRealtimeClock, 1000);
     updateRealtimeClock();
 
-    // Smooth Swipe Up System
+    // Swipe Up Gesture for Passcode Sheet
     const lockScreen = document.getElementById('lock-screen');
     let startY = 0;
     let isSwiping = false;
@@ -374,39 +388,36 @@
         isSwiping = true;
     });
 
-    lockScreen.addEventListener('touchmove', (e) => {
-        if (!isSwiping) return;
-        let currentY = e.touches[0].clientY;
-        let diffY = startY - currentY;
-        if (diffY > 0 && diffY < 200) {
-            lockScreen.style.transform = `translateY(-${diffY}px)`;
-        }
-    });
-
     lockScreen.addEventListener('touchend', (e) => {
         if (!isSwiping) return;
         let endY = e.changedTouches[0].clientY;
-        if (startY - endY > 60) {
-            triggerPasscodeScreen();
-        } else {
-            lockScreen.style.transform = 'translateY(0)';
+        if (startY - endY > 50) {
+            triggerPasscodeSheet();
         }
         isSwiping = false;
     });
 
-    function triggerPasscodeScreen() {
-        lockScreen.classList.add('swiped');
-        setTimeout(() => {
-            document.getElementById('passcode-screen').classList.add('active');
-            passInput = ''; updateDots();
-        }, 150);
+    // Mouse Fallback for Desktop Test
+    lockScreen.addEventListener('mousedown', (e) => {
+        startY = e.clientY;
+        isSwiping = true;
+    });
+    lockScreen.addEventListener('mouseup', (e) => {
+        if (!isSwiping) return;
+        if (startY - e.clientY > 40) {
+            triggerPasscodeSheet();
+        }
+        isSwiping = false;
+    });
+
+    function triggerPasscodeSheet() {
+        document.getElementById('passcode-screen').classList.add('active');
+        passInput = ''; updateDots();
     }
 
     function checkOutsidePassClick(e) {
         if (e.target.id === 'passcode-screen') {
             document.getElementById('passcode-screen').classList.remove('active');
-            lockScreen.classList.remove('swiped');
-            lockScreen.style.transform = 'translateY(0)';
         }
     }
 
@@ -429,27 +440,22 @@
         if (panelId === 'lock') {
             document.getElementById('passcode-screen').classList.remove('active');
             document.getElementById('home-screen').classList.remove('active');
-            lockScreen.classList.remove('swiped');
-            lockScreen.style.transform = 'translateY(0)';
             lockScreen.classList.add('active');
             closeApp();
         } else if (panelId === 'home') {
             document.getElementById('passcode-screen').classList.remove('active');
-            lockScreen.classList.remove('swiped');
             lockScreen.classList.remove('active');
             document.getElementById('home-screen').classList.add('active');
             closeApp();
         } else {
-            // App Tab clicked -> Open App on Phone
             document.getElementById('passcode-screen').classList.remove('active');
-            lockScreen.classList.remove('swiped');
             lockScreen.classList.remove('active');
             document.getElementById('home-screen').classList.add('active');
             openApp(panelId);
         }
     }
 
-    // File Uploads (Aspect Ratio Fit)
+    // File Uploads
     function handleFileUpload(event, targetKey) {
         const file = event.target.files[0];
         if (!file) return;
@@ -479,7 +485,12 @@
     }
 
     function saveAndRender() {
-        localStorage.setItem('ios_world_db_v6', JSON.stringify(db));
+        try {
+            localStorage.setItem('ios_world_db_v8', JSON.stringify(db));
+        } catch (e) {
+            alert('사진 용량이 너무 큽니다! 조금 더 작은 용량의 이미지를 선택해 주세요.');
+            return;
+        }
         renderPhone();
     }
 
@@ -541,7 +552,6 @@
                 setTimeout(() => {
                     if (passInput === db.pass) {
                         document.getElementById('passcode-screen').classList.remove('active');
-                        document.getElementById('home-screen').classList.add('active');
                         switchTab('home');
                     } else {
                         alert('비밀번호가 틀렸습니다.'); passInput = ''; updateDots();
